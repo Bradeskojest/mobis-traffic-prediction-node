@@ -9,15 +9,16 @@ var config = require('./config.js');
 
 // create Base in CLEAN CREATE mode
 function cleanCreateMode() {
-    qm.config('qm.conf', true, 8080, 1024); //Not needed?
-    var base = qm.create('qm.conf', '', true); // How can I spec dbPath?? You can't, this is an old way of creating store.
+    //qm.config('qm.conf', true, 8080, 1024); // DEPRICATED // Not needed?
+    //var base = qm.create('qm.conf', '', true); // DEPRICATED // How can I spec dbPath?? You can't, this is an old way of creating store.
     
     // Same as above, only a lot more verbose. The new way
     //qm.verbosity(0); //Should work with the new QMiner
-    //var base = new qm.Base({
-    //    mode: 'createClean', 
-    //    dbPath: path.join(__dirname, './db')
-    //})
+    var base = new qm.Base({
+        mode: 'createClean', 
+        //dbPath: path.join(__dirname, './db')
+        dbPath: path.join('./db') // for runnning from console
+    })
     
     // Init traffic prediction work flow
     trafficPrediction.init(base); //Initiate the traffic prediction workflow

@@ -156,7 +156,7 @@ init = function (base) {
         resampledStore.addStreamAggr({
             name: "addJoinsBack",
             onAdd: function (rec) {
-                rec.addJoin("measuredBy", trafficStore.last.measuredBy)
+                rec.$addJoin("measuredBy", trafficStore.last.measuredBy)
             },
             saveJson: function () { return {} }
         })

@@ -39,7 +39,7 @@
         var dateTimeFields = getDateTimeFieldNames(loadStores);
         
         for (var ii = 0; ii < currRecIdxs.length; ii++) {
-            var currRec = loadStores[ii].recs[currRecIdxs[ii]];
+            var currRec = loadStores[ii].allRecords[currRecIdxs[ii]];
             if (currRec == null) continue;
             if (currRec[dateTimeFields[ii]].getTime() < min) {
                 min = currRec[dateTimeFields[ii]].getTime();
@@ -67,7 +67,7 @@
             } else count++
         }
         
-        var rec = loadStores[lowestRecIdx].recs[currRecIdxs[lowestRecIdx]]
+        var rec = loadStores[lowestRecIdx].allRecords[currRecIdxs[lowestRecIdx]]
         
         // If outStores is "", we have to find appropriate store according to id
         if (targetStores === "") {
@@ -77,9 +77,9 @@
             //console.log("Getting rec with id: " + id + ", Timestamp: " + rec.DateTime.toISOString());
             //console.log("Saving it to store: " + trafficStore.name);
 
-            trafficStore.add(rec.toJSON(true));
+            trafficStore.push(rec.toJSON(true));
         } else {
-            targetStores[lowestRecIdx].add(rec.toJSON(true));
+            targetStores[lowestRecIdx].push(rec.toJSON(true));
         }
         
         currRecIdxs[lowestRecIdx]++
