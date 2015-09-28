@@ -1,4 +1,10 @@
-﻿// Import modules
+﻿/**
+ * This script simulates data flow from one sensors, 
+ * develops prediction models
+ * makes predictions and evaluates them
+*/
+ 
+// Import modules
 var qm = require('qminer');
 var path = require('path');
 var server = require('./server/server.js');

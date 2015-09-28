@@ -7,6 +7,14 @@ var config = require('./config.js');
 //var config = require('./config-release.js');
 
 
+/**
+ * Copyright (c) 2015, Jozef Stefan Institute
+ * All rights reserved.
+ * 
+ * This source code is licensed under the FreeBSD license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 // create Base in CLEAN CREATE mode
 function cleanCreateMode() {
     //qm.config('qm.conf', true, 8080, 1024); // DEPRICATED // Not needed?

@@ -46,10 +46,13 @@ createLinRegModels = function (fields, horizons, ftrSpace) {
     var linregs = []; // this will be array of objects
     for (var field in fields) { // models for prediction fields
         linregs[field] = [];
+        linregs[field]["Model"] = { "field": fields[field].field.name };
         for (var horizon in horizons) { // models for horizons
             linregs[field][horizon] = [];
+            linregs[field][horizon]["Model"] = {"horizon": horizons[horizon]};
             for (var i = 0; i < 2; i++) { // 2 models: working day or not
                 linregs[field][horizon][i] = [];
+                linregs[field][horizon][i]["Model"] = { "WorkingDay": Boolean(i) }
                 for (var j = 0; j < 24; j++) { // 24 models: for every hour in day
                     linregs[field][horizon][i][j] = new analytics.RecLinReg({ "dim": ftrSpace.dim, "forgetFact": 1, "regFact": 10000 });
                     linregs[field][horizon][i][j]["predictionField"] = fields[field].field.name;
@@ -141,7 +144,7 @@ Model.prototype.update = function (rec) {
                 
                 // Update models
                 this.avrVal.setVal(locAvrg.getVal(rec)) // Set avrVal that is used by ftrExtractor (avrVal.getVal())
-                linreg.partialFit(this.featureSpace.extractVector(rec), targetVal);
+                linreg.partialFit(this.featureSpace.extractVector(trainRec), targetVal);
                 linreg.updateCount++;
 
             }
@@ -251,14 +254,17 @@ Model.prototype.consoleReport = function (rec) {
         console.log("Update count: " + trainRec.Predictions[horizonIdx].UpdateCount + "\n")
         console.log("Working on rec: " + rec.DateTime.toISOString());
         console.log("Prediction from: " + trainRec.Predictions[horizonIdx].OriginalTime.toISOString()); // Same as trainRec.DateTime.string             
-        console.log("Prediction horizon: " + trainRec.Predictions[horizonIdx].PredictionHorizon + "\n")
+        console.log("Prediction horizon: " + trainRec.Predictions[horizonIdx].PredictionHorizon)
         //console.log("Target: " + rec[this.target.name]); 
         //console.log(this.target.name + ": " + trainRec.Predictions[horizonIdx][this.target.name]);
-
+                        
+        // report predicted values
+        console.log("\n--> Predicted values:");
         this.predictionFields.forEach(function (predField) {
-            var predFieldNm = predField.field.name;
-            var predValue = trainRec.Predictions[horizonIdx][predFieldNm];
-            console.log(predFieldNm + ": " + predValue);
+            var fieldNm = predField.field.name;
+            var predValue = trainRec.Predictions[horizonIdx][fieldNm];
+            var trueValue = rec[fieldNm];
+            console.log("%s: %s (true: %s)", fieldNm, predValue.toFixed(2), trueValue.toFixed(2));
         });
         
         // Report evaluation metrics in the console

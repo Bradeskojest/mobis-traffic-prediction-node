@@ -1,4 +1,8 @@
-﻿// Import modules
+﻿/**
+ * This script is used by index.js
+*/
+
+// Import modules
 var qm = require('qminer');
 var path = require('path');
 var evaluation = require('./my_modules/utils/online-evaluation/evaluation.js')
