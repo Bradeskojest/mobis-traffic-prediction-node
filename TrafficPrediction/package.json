@@ -7,6 +7,9 @@
     "name": "bkazic",
     "email": ""
   },
+  "scripts": {
+    "start": "set NODE_ENV=development&& node index.js"
+  },
   "dependencies": {
     "basic-auth": "^1.0.3",
     "body-parser": "^1.14.0",

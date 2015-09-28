@@ -3,17 +3,10 @@ qm.delLock(); // lock has to be deleted before the new module import
 var trafficPrediction = require('./TrafficPrediction.js');
 var server = require('./server/server.js');
 var path = require('path');
-var config = require('./config.js');
+//var config = require('./config.js');
+var env = process.env.NODE_ENV || 'development';
+var config = require('./config.json')[env];
 //var config = require('./config-release.js');
-
-
-/**
- * Copyright (c) 2015, Jozef Stefan Institute
- * All rights reserved.
- * 
- * This source code is licensed under the FreeBSD license found in the
- * LICENSE file in the root directory of this source tree.
- */
 
 // create Base in CLEAN CREATE mode
 function cleanCreateMode() {
