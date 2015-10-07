@@ -3,6 +3,7 @@ qm.delLock(); // lock has to be deleted before the new module import
 var trafficPrediction = require('./TrafficPrediction.js');
 var server = require('./server/server.js');
 var path = require('path');
+var createBase = require('./createBase.js');
 //var config = require('./config.js');
 var env = process.env.NODE_ENV || 'development';
 var config = require('./config.json')[env];
@@ -67,6 +68,10 @@ var createBase = {
 var base = createBase.cleanCreateMode();
 //var base = createBase.openMode();
 //var base = createBase.readOnlyMode();
+
+// read input script argument for mode type. Default is "cleanCreate"
+//var scriptArgs = (process.argv[2] == null) ? "cleanCreate" : process.argv[2];
+//var base = createBase.mode(scriptArgs);
 
 // START SERVER
 server.init(base);

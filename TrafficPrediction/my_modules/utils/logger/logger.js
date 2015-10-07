@@ -6,7 +6,7 @@ var env = process.env.NODE_ENV || 'development';
 var config = require('../../../config.json')[env];
 
 // Check if logs folder exists. If not, create it.
-var dir = './server/logs';
+var dir = path.join(__dirname, '../../../server/logs');
 if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
 }
@@ -40,8 +40,6 @@ var logger = new winston.Logger({
             colorize: false
         }),
         new winston.transports.Console({
-            //level: 'debug', // Delete this later if everything is ok
-            //level: 'error', // Delete this later if everything is ok
             level: config.logger.console.level,
             handleExceptions: true,
             json: false,

@@ -1,0 +1,29 @@
+﻿{
+    "development": {
+        "trafficPredictionService": {
+            "server": {
+				"root": "http://localhost:1337",
+                "port": 1337
+            }
+        },
+        "admins": {
+            "foo": { "password": "bar" },
+            "admin": { "password": "admin" }
+        },
+        "logger": {
+            "console": { "level": "info" }
+        }
+    },
+    
+    "production": {
+        "trafficPredictionService": {
+            "server": {
+				"root": "http://mustang.ijs.si:9570",
+                "port": 9570
+            }
+        }, 
+        "logger": {
+            "console": { "level": "debug" }
+        }
+    }
+}
