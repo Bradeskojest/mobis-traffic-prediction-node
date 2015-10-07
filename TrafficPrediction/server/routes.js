@@ -11,7 +11,10 @@ function setup(app, handlers) {
     app.get('/close-base', auth, handlers.service.handleCloseBase.bind(handlers.service));
     
     // http://mustang.ijs.si:9570/traffic-predictions/get-store-list
-    app.get('/traffic-predictions/get-store-list', handlers.trafficPrediction.handleGetStoreList.bind(handlers.trafficPrediction));
+    app.get('/get-store-list', handlers.service.handleGetStoreList.bind(handlers.trafficPrediction));
+    // http://mustang.ijs.si:9570/get-store-recs/predictionStores?limit=20 // limit is optional param to limit the size of output
+    app.get('/get-store-recs/:store', auth, handlers.service.handleGetStoreRecs.bind(handlers.service));
+    
     // http://mustang.ijs.si:9570/traffic-predictions/get-sensors
     app.get('/traffic-predictions/get-sensors', handlers.trafficPrediction.handleGetSensors.bind(handlers.trafficPrediction));
     

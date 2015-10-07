@@ -25,5 +25,20 @@
         "logger": {
             "console": { "level": "debug" }
         }
+    },
+
+	"test": {
+        "trafficPredictionService": {
+            "server": {
+				"root": "http://localhost:3333",
+                "port": 3333
+            }
+        }, 
+		"admins": {
+            "test": { "password": "test" }
+        },
+        "logger": {
+            "console": { "level": "error" }
+        }
     }
 }

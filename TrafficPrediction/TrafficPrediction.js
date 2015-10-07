@@ -6,6 +6,7 @@
 var qm = require('qminer');
 var path = require('path');
 var evaluation = require('./my_modules/utils/online-evaluation/evaluation.js')
+var logger = require("./my_modules/utils/logger/logger.js");
 
 // Import my modules
 Utils = {};
@@ -104,10 +105,10 @@ init = function (base) {
             ]
         }
         
-        console.log("\nInitializing MobiS model for sensor: " + sensorId);
-        console.log("sourceStore: " + modelConf.stores.sourceStore.name);
-        console.log("predictionStore: " + modelConf.stores.predictionStore.name);
-        console.log("evaluationStore: " + modelConf.stores.evaluationStore.name);
+        logger.info("\nInitializing MobiS model for sensor: " + sensorId);
+        logger.info("sourceStore: " + modelConf.stores.sourceStore.name);
+        logger.info("predictionStore: " + modelConf.stores.predictionStore.name);
+        logger.info("evaluationStore: " + modelConf.stores.evaluationStore.name);
         
         // Create model instance for specific sensor
         var mobisModel = new Model(modelConf);
@@ -123,7 +124,8 @@ init = function (base) {
 
     sensorIds.forEach(function (sensorId) {
         
-        console.log("\n[Stream Aggregate] Adding Stream Aggregates for sensor: " + sensorId)
+        logger.info("\n[Stream Aggregate] Adding Stream Aggregates for sensor: " + sensorId);
+        
         // Prepare store references
         var trafficStore = Stores.trafficStores[sensorId];
         var resampledStore = Stores.resampledStores[sensorId];
@@ -136,7 +138,7 @@ init = function (base) {
 
         //////// RESAMPLER ////////
         
-        console.log("[Stream Aggregate] adding Resampler");
+        logger.info("[Stream Aggregate] adding Resampler");
         
         var resampleInterval = 60 * 60 * 1000;
         trafficStore.addStreamAggr({
@@ -154,7 +156,7 @@ init = function (base) {
         
         //////// ADD JOINS BACK ////////
         
-        console.log("[Stream Aggregate] adding addJoinsBack");
+        logger.info("[Stream Aggregate] adding addJoinsBack");
         
         // Ads a join back, since it was lost with resampler
         resampledStore.addStreamAggr({
@@ -168,7 +170,7 @@ init = function (base) {
         
         //////// ANALYTICS ////////
         
-        console.log("[Stream Aggregate] adding Analytics");
+        logger.info("[Stream Aggregate] adding Analytics");
         
         resampledStore.addStreamAggr({
             name: "analytics",
@@ -179,7 +181,7 @@ init = function (base) {
                 mobisModel.predict(rec);
                 mobisModel.update(rec);
                 mobisModel.evaluate(rec);
-                mobisModel.consoleReport(rec);
+                //mobisModel.consoleReport(rec);
 
             },
             saveJson: function () { return {} }

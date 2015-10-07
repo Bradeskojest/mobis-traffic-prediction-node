@@ -4,10 +4,8 @@ var trafficPrediction = require('./TrafficPrediction.js');
 var server = require('./server/server.js');
 var path = require('path');
 var createBase = require('./createBase.js');
-//var config = require('./config.js');
 var env = process.env.NODE_ENV || 'development';
 var config = require('./config.json')[env];
-//var config = require('./config-release.js');
 
 // create Base in CLEAN CREATE mode
 function cleanCreateMode() {
@@ -31,6 +29,7 @@ function cleanCreateMode() {
     //trafficPrediction.importData(base, "./sandbox/measurements3sensors3months.txt")
     //trafficPrediction.importData(base, "./sandbox/chunk1measurements3sensors3months.txt") // Small chuck of previous (from march on).
     //trafficPrediction.importData(base, "./sandbox/measurements_obvoznica.txt")
+    trafficPrediction.importData(base, "./sandbox/data-small.json")
     
 
     //base.close();

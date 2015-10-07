@@ -17,7 +17,7 @@ var base = new qm.Base({
             ]
         }
     ],
-    dbPath: path.join(__dirname, './db') 
+    dbPath: path.join(__dirname, './db2') 
 });
 
 var testStore = base.store('testStore');

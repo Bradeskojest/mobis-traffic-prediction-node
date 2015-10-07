@@ -72,7 +72,7 @@
         // If outStores is "", we have to find appropriate store according to id
         if (targetStores === "") {
             id = rec.measuredBy.Name.replace("-", "_");
-            trafficStore = rec.store.base.store("trafficStore_" + id);
+            trafficStore = rec.$store.base.store("trafficStore_" + id);
             
             //console.log("Getting rec with id: " + id + ", Timestamp: " + rec.DateTime.toISOString());
             //console.log("Saving it to store: " + trafficStore.name);

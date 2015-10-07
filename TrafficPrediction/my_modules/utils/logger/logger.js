@@ -49,6 +49,21 @@ var logger = new winston.Logger({
     exitOnError: false
 });
 
+// if NODE_ENV is set to "test", do not write logs to file (overwrite logger)
+if (env === "test") {
+    var logger = new winston.Logger({
+        transports: [
+            new winston.transports.Console({
+                level: config.logger.console.level,
+                handleExceptions: true,
+                json: false,
+                colorize: true
+            })
+        ],
+        exitOnError: false
+    });
+}
+
 module.exports = logger;
 module.exports.stream = {
     write: function (message, encoding) {

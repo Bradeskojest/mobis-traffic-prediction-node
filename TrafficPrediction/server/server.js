@@ -29,7 +29,7 @@ function init(base) {
 // Functions that starts the server
 function start(_port) {
     var port = _port || process.env.port || 1337;
-    app.listen(port);
+    server = app.listen(port);
 
     //console.log("\n\x1b[32m[Server] Express server listening on port %d in %s mode\n\x1b[0m", port, app.settings.env);
     logger.info("\x1b[32m[Server] Express server listening on port %d in %s mode\n\x1b[0m", port, app.settings.env)
