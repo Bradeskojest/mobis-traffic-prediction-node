@@ -176,7 +176,9 @@ init = function (base) {
             name: "analytics",
             onAdd: function (rec) {
                 
-                var mobisModel = mobisModels[sensorId];
+                var id = rec.measuredBy.Name.replace("-", "_")
+                var mobisModel = mobisModels[id];
+                //var mobisModel = mobisModels[sensorId];
                 
                 mobisModel.predict(rec);
                 mobisModel.update(rec);
