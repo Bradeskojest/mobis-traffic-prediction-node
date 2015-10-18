@@ -152,8 +152,8 @@ TrafficPredictionHandler.prototype.handleAddMeasurement = function (req, res) {
         logger.error(err.stack);
     }
     
-    // If record was not stored sucesfully, id will be -1
-    if (id == -1) {
+    // Check if record was stored sucessfully
+    if (id == -1 || trafficStore[id] == null) {
         logger.error("Record was not stored");
         res.status(400).json({ error: 'Record not stored!' }).end()
         return;
