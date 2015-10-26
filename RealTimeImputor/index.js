@@ -4,7 +4,7 @@ var config = require('./config-debug.js');
 //var config = require('./config-release.js');
 var logger = require('./my_modules/logger/logger.js');
 
-var interval = 60 * 1000;
+var interval = 60 * 1000; // 1 minute
 var trafficRetriever = new TrafficRetriever("http://opendata.si/promet/counters/");
 
 var importUrl = config.trafficPredictionService.root + "/traffic-predictions/add";
@@ -33,7 +33,7 @@ var importUrl = config.trafficPredictionService.root + "/traffic-predictions/add
 // USING ASYNC MODULE - Doesent work as it should
 // Main process
 (function startFetching() {
-    trafficRetriever.test(function (err, rec, callback) {
+    trafficRetriever.start(function (err, rec, callback) {
         if (err) throw err;
         console.log("Sending record:\n" + JSON.stringify(rec, null, 2));
     
