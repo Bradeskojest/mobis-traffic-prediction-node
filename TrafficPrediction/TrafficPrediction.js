@@ -183,7 +183,7 @@ init = function (base) {
                 mobisModel.predict(rec);
                 mobisModel.update(rec);
                 mobisModel.evaluate(rec);
-                //mobisModel.consoleReport(rec);
+                mobisModel.consoleReport(rec);
 
             },
             saveJson: function () { return {} }

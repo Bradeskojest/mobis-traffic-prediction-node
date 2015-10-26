@@ -28,8 +28,8 @@ function cleanCreateMode() {
     ////trafficPrediction.importData(base, "./sandbox/measurements_9_sens_3_mon.txt")
     //trafficPrediction.importData(base, "./sandbox/measurements3sensors3months.txt")
     //trafficPrediction.importData(base, "./sandbox/chunk1measurements3sensors3months.txt") // Small chuck of previous (from march on).
-    //trafficPrediction.importData(base, "./sandbox/measurements_obvoznica.txt")
-    trafficPrediction.importData(base, "./sandbox/data-small.json")
+    trafficPrediction.importData(base, "./sandbox/measurements_obvoznica.txt")
+    //trafficPrediction.importData(base, "./sandbox/data-small.json")
     
 
     //base.close();
