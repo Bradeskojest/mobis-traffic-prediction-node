@@ -178,12 +178,22 @@ init = function (base) {
                 
                 var id = rec.measuredBy.Name.replace("-", "_")
                 var mobisModel = mobisModels[id];
-                //var mobisModel = mobisModels[sensorId];
                 
                 mobisModel.predict(rec);
-                mobisModel.update(rec);
-                mobisModel.evaluate(rec);
-                mobisModel.consoleReport(rec);
+                //mobisModel.update(rec);
+                //mobisModel.evaluate(rec);
+                //mobisModel.consoleReport(rec);
+                                
+                // do not update if the gap between last record and resampled record is bigger than 2 hours
+                var lastId = (trafficStore.length > 2) ? trafficStore.length - 2 : 0
+                if (rec.DateTime - trafficStore[lastId].DateTime <= 2 * 60 * 60 * 1000) {
+
+                    //mobisModel.predict(rec);
+                    mobisModel.update(rec);
+                    mobisModel.evaluate(rec);
+                    mobisModel.consoleReport(rec);
+                    
+                }
 
             },
             saveJson: function () { return {} }

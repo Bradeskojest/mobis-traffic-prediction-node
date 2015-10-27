@@ -1,7 +1,7 @@
 ﻿var qm = require('qminer');
 var path = require('path');
-var config = require('./config-debug.js');
-//var config = require('./config-release.js');
+var env = process.env.NODE_ENV || 'development';
+var config = require('./config.json')[env];
 
 // Import my modules
 Utils = require('./my_modules/utils/importData.js');
@@ -54,6 +54,6 @@ var base = createBase.cleanCreateMode();
 //var base = createBase.readOnlyMode();
 
 // Start importing records
-var url = config.trafficPredictionService.root + "/traffic-predictions/add";
+var url = config.trafficPredictionService.server.root + "/traffic-predictions/add";
 Utils.importData(url, [base.store('trafficLoadStore')], [base.store('trafficStore')])
 
