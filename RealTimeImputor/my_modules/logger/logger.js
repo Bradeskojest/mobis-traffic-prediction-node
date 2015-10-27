@@ -1,8 +1,11 @@
 ﻿var winston = require('winston');
 var fs = require('fs');
+var path = require('path');
+var env = process.env.NODE_ENV || 'development';
+var config = require('../../config.json')[env];
 
 // Check if logs folder exists. If not, create it.
-var dir = './logs';
+var dir = path.join(__dirname, '../../logs');
 if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
 }
@@ -17,7 +20,7 @@ var logger = new winston.Logger({
             name: 'file.all',
             level: 'info', 
             datePattern: '.yyyy-MM-dd',
-            filename: './logs/all-logs.log',
+            filename: path.join(__dirname, '../../logs/all-logs.log'),
             handleExceptions: true,
             zippedArchive: true,
             json: true,
@@ -30,7 +33,7 @@ var logger = new winston.Logger({
             name: 'file.error',
             level: 'error', 
             datePattern: '.yyyy-MM',
-            filename: './logs/error-logs.log',
+            filename: path.join(__dirname, '../../logs/error-logs.log'),
             handleExceptions: true,
             json: true,
             maxsize: 5242880, //5MB
@@ -38,7 +41,7 @@ var logger = new winston.Logger({
             colorize: false
         }),
         new winston.transports.Console({
-            level: 'info',
+            level: config.logger.console.level,
             handleExceptions: true,
             json: false,
             colorize: true,
