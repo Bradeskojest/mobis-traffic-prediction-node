@@ -8,7 +8,7 @@ function cleanCreateMode() {
     // Initialise base in clean create mode   
     var base = new qm.Base({
         mode: 'createClean', 
-        schemaPath: path.join(__dirname, './store.def'), // its more robust but, doesen't work from the console (doesent know __dirname)
+        //schemaPath: path.join(__dirname, './store.def'), // its more robust but, doesen't work from the console (doesent know __dirname)
         dbPath: path.join(__dirname, './db'),
     })
     
@@ -42,7 +42,7 @@ function cleanCreateLoadMode() {
     // Initialise base in clean create mode   
     var base = new qm.Base({
         mode: 'createClean', 
-        schemaPath: path.join(__dirname, './store.def'), // its more robust but, doesen't work from the console (doesent know __dirname)
+        //schemaPath: path.join(__dirname, './store.def'), // its more robust but, doesen't work from the console (doesent know __dirname)
         dbPath: path.join(__dirname, './db'),
     })
     
@@ -51,7 +51,13 @@ function cleanCreateLoadMode() {
     
     // Import initial data
     logger.info("Training models...")
-    qm.load.jsonFile(base.store("rawStore"), "./sandbox/data1.json ");
+    //qm.load.jsonFile(base.store("rawStore"), "./sandbox/data1.json ");
+    ////trafficPrediction.importData(base, "./sandbox/measurements_0011_11.txt")
+    ////trafficPrediction.importData(base, "./sandbox/measurements_9_sens_3_mon.txt")
+    //trafficPrediction.importData(base, "./sandbox/measurements3sensors3months.txt")
+    //trafficPrediction.importData(base, "./sandbox/chunk1measurements3sensors3months.txt") // Small chuck of previous (from march on).
+    trafficPrediction.importData(base, "./sandbox/measurements_obvoznica.txt")
+    //trafficPrediction.importData(base, "./sandbox/data-small.json")
     
     return base;
 }

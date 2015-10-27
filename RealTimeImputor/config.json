@@ -6,12 +6,8 @@
                 "port": 1337
             }
         },
-        "admins": {
-            "foo": { "password": "bar" },
-            "admin": { "password": "admin" }
-        },
         "logger": {
-            "console": { "level": "info" }
+            "console": { "level": "debug" }
         }
     },
     
@@ -23,7 +19,7 @@
             }
         }, 
         "logger": {
-            "console": { "level": "debug" }
+            "console": { "level": "info" }
         }
     },
 
@@ -34,9 +30,6 @@
                 "port": 3333
             }
         }, 
-		"admins": {
-            "test": { "password": "test" }
-        },
         "logger": {
             "console": { "level": "error" }
         }
