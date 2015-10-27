@@ -35,7 +35,7 @@ var importUrl = config.trafficPredictionService.root + "/traffic-predictions/add
 (function startFetching() {
     trafficRetriever.start(function (err, rec, callback) {
         if (err) throw err;
-        console.log("Sending record:\n" + JSON.stringify(rec, null, 2));
+        logger.debug("Sending record:\n" + JSON.stringify(rec, null, 2));
     
         var headers = {
             'Content-Type': 'application/json',
@@ -46,6 +46,8 @@ var importUrl = config.trafficPredictionService.root + "/traffic-predictions/add
             if (err) logger.error(err.stack);
             
             logger.debug("Response: " + body);
+            if (res.statusCode == 200) logger.info("Sent record:\n" + JSON.stringify(rec, null, 2))
+
             callback(); // wait for the response from the server before moving on
         });
         //callback();
