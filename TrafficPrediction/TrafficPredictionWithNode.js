@@ -1,7 +1,13 @@
-﻿// Import modules
+﻿/**
+ * This script simulates data flow from one sensors, 
+ * develops prediction models
+ * makes predictions and evaluates them
+*/
+ 
+// Import modules
 var qm = require('qminer');
 var path = require('path');
-var server = require('./server.js');
+var server = require('./server/server.js');
 var evaluation = require('./my_modules/utils/online-evaluation/evaluation.js')
 
 // Import my modules
@@ -14,15 +20,15 @@ Model = require('./my_modules/utils/mobis-model/model.js')
 //// Define stores
 qm.delLock();
 //qm.config('qm.conf', true, 8080, 1024);
-var base = qm.create('qm.conf', 'sensors.def', true); // How can I spec dbPath??
+//var base = qm.create('qm.conf', 'sensors.def', true); // How can I spec dbPath??
 
-// TODO: Why cant I use schema with this constructor?
 //qm.delLock();
-//var base = new qm.Base({
-//    mode: 'createClean', 
-//    schemaPath: 'sensors.def',
-//    dbPath: path.join(__dirname, './db')
-//})
+var base = new qm.Base({
+    mode: 'createClean', 
+    schemaPath: 'sensors.def',
+    //dbPath: path.join(__dirname, './db')
+    dbPath: path.join('./db')
+})
 
 var CounterNode = base.store("CounterNode");
 var Evaluation = base.store("Evaluation");
@@ -125,7 +131,7 @@ trafficStore.addStreamAggr({
 resampledStore.addStreamAggr({
     name: "addJoinsBack",
     onAdd: function (rec) {
-        rec.addJoin("measuredBy", trafficStore.last.measuredBy)
+        rec.$addJoin("measuredBy", trafficStore.last.measuredBy)
     },
     saveJson: function () { return {} }
 
@@ -155,19 +161,21 @@ resampledStore.addStreamAggr({
 ///////////////////// LOADING DATA: SIMULATING DATA FLOW /////////////////////
 // Load stores
 qm.load.jsonFile(base.store("CounterNode"), "./sandbox/countersNodes.txt");
-qm.load.jsonFile(base.store('trafficLoadStore'), "./sandbox/measurements_0011_11.txt");
+//qm.load.jsonFile(base.store('trafficLoadStore'), "./sandbox/measurements_0011_11.txt");
+qm.load.jsonFile(base.store('trafficStore'), "./sandbox/measurements_0011_11.txt");
 //qm.load.jsonFileLimit(base.store('trafficLoadStore'), "./sandbox/measurements_0011_11.txt",1000);
 
 // Simultaing data flow (later this shuld be replaced by imputor)
 //Utils.Data.importData([trafficLoadStore], [trafficStore]);
-Utils.Data.importData([trafficLoadStore], [trafficStore], 10000);
+//Utils.Data.importData([trafficLoadStore], [trafficStore], 10000);
 
 
-console.log(trafficStore.recs.length); // DEBUGING
+console.log(trafficStore.allRecords.length); // DEBUGING
 console.log("Max speed:" + resampledStore.last.measuredBy.MaxSpeed); //DEBUGING
 
 console.log(base.getStoreList().map(function (store) { return store.storeName}))
 
 ///////////////////// REST SERVER /////////////////////
 // Start the server
+server.init(base);
 server.start();

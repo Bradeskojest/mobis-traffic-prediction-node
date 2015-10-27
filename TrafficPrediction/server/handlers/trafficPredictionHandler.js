@@ -29,7 +29,7 @@ TrafficPredictionHandler.prototype.handleGetStoreList = function (req, res) {
 // Returns sensor id stores
 TrafficPredictionHandler.prototype.handleGetSensors = function (req, res) {
     try {
-        res.status(200).json(this.base.store("CounterNode").recs.toJSON().records);
+        res.status(200).json(this.base.store("CounterNode").allRecords.toJSON().records);
     }
     catch (err) {
         if (typeof err.message != 'undefined' && err.message == "[addon] Exception: Base is closed!") {
@@ -134,7 +134,6 @@ TrafficPredictionHandler.prototype.handleAddMeasurement = function (req, res) {
             logger.error(err.stack);
         }
     }
-    
     // Find proper store
     var storeName = "trafficStore_" + id;
     trafficStore = this.base.store(storeName);
@@ -146,15 +145,15 @@ TrafficPredictionHandler.prototype.handleAddMeasurement = function (req, res) {
     
     // Try to add record to store
     try {
-        var id = trafficStore.add(rec);
+        var id = trafficStore.push(rec);
     }
     catch (err) {
         res.status(500).json({ error: "Internal Server Error" }).end();
         logger.error(err.stack);
     }
     
-    // If record was not stored sucesfully, id will be -1
-    if (id == -1) {
+    // Check if record was stored sucessfully
+    if (id == -1 || trafficStore[id] == null) {
         logger.error("Record was not stored");
         res.status(400).json({ error: 'Record not stored!' }).end()
         return;

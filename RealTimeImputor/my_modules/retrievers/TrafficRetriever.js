@@ -40,7 +40,7 @@ TrafficRetriever.prototype.fetchData = function (callback) {
     }.bind(this));
 }
 
-async.eachSeries
+//async.eachSeries
 
 
 // Parse all measurements first, and send them after
@@ -65,7 +65,7 @@ async.eachSeries
 
 // USING ASYNC MODULE
 // Parse and send measurement one by one.
-TrafficRetriever.prototype.test = function (callback) {
+TrafficRetriever.prototype.start = function (callback) {
     this.fetchData(function (error, data) {
         if (error) return callback(error)
         
@@ -78,7 +78,10 @@ TrafficRetriever.prototype.test = function (callback) {
             logger.debug("Count:", count++); // Just for debugging
 
         }, function (err) {
-            if (err) throw err;
+            if (err) {
+                return callback(err);
+                logger.error(err.stack);
+            }
             logger.info("My job here is done. Going to sleep.");
             // TODO Report status --> how many records was added, how many discarded.
         });
@@ -103,7 +106,7 @@ TrafficRetriever.prototype.saveToMongo = function () {
 // Formating measure record to match QMiner format
 function formatMeasurementRecord(data) {
     var rec = {
-        DateTime: generateDateTime(checkField(data, "stevci_ura"), checkField(data, "stevci_datum")),
+        DateTime: generateDateTime(checkField(data, "stevci_datum"), checkField(data, "stevci_ura")),
         NumOfCars: checkField(data, "stevci_stev"),
         Occupancy: checkField(data, "stevci_occ"),
         Speed: checkField(data, "stevci_hit"),
@@ -117,7 +120,8 @@ function formatMeasurementRecord(data) {
 // generate DateTime object (ISO format)
 function generateDateTime(dateString, timeString) {
     try {
-        var date = new Date(dateString + timeString)//TODO: check if in traffic prediction model .toISOString works correctly
+        //var date = new Date(dateString + " " + timeString)
+        var date = parseDateTime(dateString, timeString)
     } catch (e) {
         logger.error(e.stack)
     }
@@ -130,6 +134,42 @@ function generateDateTime(dateString, timeString) {
     } catch (e) { 
         logger.error(e.stack)
     }
+}
+
+function parseDateTime(d, t) { 
+    // 2 options of dateTime format:
+    // 1.) is "6/29/2015" + "9:35:00 PM"
+    // 2.) is "15/09/2015" + "02:30:00"
+    var date;
+
+    // check if we are dealing with format: "6/29/2015" + "9:35:00 PM"
+    if (t.indexOf("PM" || "AM") > -1) { 
+        date = new Date(d + " " + t)
+    } else {
+        var dateParts = d.split('/')
+        date = new Date (dateParts[1] + "/" + dateParts[0] + "/" + dateParts[2] + " " + t)
+    }
+    
+    // check if date was correctly parsed
+    try {
+        date = ifDateIsValid(date)
+    } catch (e) {
+        var message = "Timesatmp '" + d + " " + t + "' was not corectly parsed."
+        logger.error(message);
+        throw new Error(message);
+    }
+
+    return date;
+}
+
+function ifDateIsValid(d) {
+    // ref: http://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript
+    if (Object.prototype.toString.call(d) === "[object Date]") {
+        if (!isNaN(d.getTime())) {  // d.valueOf() could also work
+            return d
+        }
+    }
+    throw new Error();
 }
 
 // Check if this field exists. If not, throw error.
