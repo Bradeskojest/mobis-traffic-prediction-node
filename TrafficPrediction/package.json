@@ -1,8 +1,8 @@
 {
   "name": "TrafficPrediction",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "TrafficPrediction",
-  "main": "server.js",
+  "main": "index.js",
   "author": {
     "name": "bkazic",
     "email": "blaz.kazic@ijs.si"
@@ -20,7 +20,7 @@
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
     "morgan": "^1.6.1",
-    "qminer": "^2.2.1",
+    "qminer": "^3.1.0",
     "winston": "^1.0.1"
   },
   "devDependencies": {
