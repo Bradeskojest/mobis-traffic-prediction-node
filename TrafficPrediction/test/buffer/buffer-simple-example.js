@@ -30,7 +30,7 @@ for (i = 0; i < 5; i++) {
 };
 
 // saving buffer aggregate state
-var fout = qm.fs.openWrite('buff.bin');
+var fout = qm.fs.openWrite(buffer.name);
 buffer.save(fout);
 fout.close();
 
@@ -42,7 +42,7 @@ var bufferTest = base.store("Heat").addStreamAggr({
 });
 
 // loading state to bufferTest
-var fin = qm.fs.openRead('buff.bin');
+var fin = qm.fs.openRead(buffer.name)
 bufferTest.load(fin);
 
 // test if aggregates have the same state

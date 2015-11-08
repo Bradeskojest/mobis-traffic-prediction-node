@@ -33,7 +33,7 @@ describe('Loading/Saving buffer aggregate', function () {
     };
     
     // saving buffer aggregate state
-    var fout = qm.fs.openWrite('buff.bin');
+    var fout = qm.fs.openWrite(buffer.name);
     buffer.save(fout);
     fout.close();
     
@@ -45,13 +45,13 @@ describe('Loading/Saving buffer aggregate', function () {
     });
     
     // loading state to bufferTest
-    var fin = qm.fs.openRead('buff.bin');
+    var fin = qm.fs.openRead(buffer.name)
     bufferTest.load(fin);
     
     // check if equal
-    it('should load identical aggr state, as it was saved', function () { 
+    it('should load identical aggregate state as it was saved', function () {
         assert.equal(JSON.stringify(buffer.val), JSON.stringify(bufferTest.val));
-    })
+    });
 
 });
 
