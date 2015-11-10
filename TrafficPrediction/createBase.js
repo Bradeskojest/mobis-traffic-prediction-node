@@ -22,7 +22,7 @@ function cleanCreateMode() {
 function openMode() {
     var base = new qm.Base({
         mode: 'open',
-        //dbPath: path.join(__dirname, './db') //If the code is copied in terminal, this has to commented out, since __dirname is not known from terminal
+        dbPath: path.join(__dirname, './db') //If the code is copied in terminal, this has to commented out, since __dirname is not known from terminal
     })
     trafficPrediction.init(base); //Initiate the traffic prediction workflow
     return base;

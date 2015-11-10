@@ -50,6 +50,7 @@ init = function (base) {
         // Define model configurations
         var modelConf = {
             base: base,
+            sensorId: sensorId,
             locAvr: avrVal, // Not sure if this is ok, has to be debuged
             stores: {
                 "sourceStore": resampledStore,

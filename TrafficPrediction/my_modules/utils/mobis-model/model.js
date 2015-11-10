@@ -1,6 +1,8 @@
 //Imports
-var qm = require('qminer');
+//var qm = require('qminer');
+var qm = require('../../../../../../../cpp/QMiner/index.js');
 var logger = require("../logger/logger.js");
+var path = require('path');
 
 SpecialDates = require('../special-dates/special-dates.js')
 LocalizedAverage = require('../baseline-models/localized-average.js')
@@ -9,28 +11,7 @@ var analytics = qm.analytics;
 var specialDates = new SpecialDates.newSpecialDates('Slovenian_holidays');
 var CalendarFtrs = SpecialDates.newCalendarFeatures();
 
-createBuffers = function (horizons, store) {
-    // Initialize RecordBuffers definiton for all horizons 
-    RecordBuffers = [];
-    for (var horizon in horizons) {
-        recordBuffer = {
-            name: "delay_" + horizons[horizon] + "h",
-            type: "recordBuffer",
-            horizon: horizons[horizon] + 1
-        };
-        RecordBuffers.push(recordBuffer);
-    };
-
-    // Execute buffer agregates for all horizons
-    for (var horizon in horizons) {
-        var RecordBuffer = RecordBuffers[horizon];
-
-        store.addStreamAggr({
-            name: RecordBuffer.name, type: RecordBuffer.type, size: RecordBuffer.horizon
-        });
-    };
-    return RecordBuffers;
-};
+var modelBuffers = require('./model-buffers.js');
 
 createAvrgModels = function (targetFields) {
     // create set of locAvr models, for every target field
@@ -93,6 +74,7 @@ createErrorModels = function (fields, horizons, errMetrics) {
 var Model = function (modelConf) {
     
     this.base = modelConf.base;
+    this.sensorId = modelConf.sensorId;
     this.avrVal = modelConf.locAvr;
     this.horizons = (modelConf.predictionHorizons == null) ? 1 : modelConf.predictionHorizons;
     //this.featureSpace = modelConf.featureSpace; // TODO: what to do if it is not defined (if it is null) ?????
@@ -106,7 +88,8 @@ var Model = function (modelConf) {
     this.evalOffset = (modelConf.otherParams.evaluationOffset == null) ? 50 : modelConf.otherParams.evaluationOffset;
     this.errorMetrics = modelConf.errorMetrics;
 
-    this.recordBuffers = createBuffers(this.horizons, this.store);
+    //this.recordBuffers = createBuffers(this.horizons, this.store);
+    this.recordBuffers = modelBuffers.createBuffers(this.horizons, this.store);
     this.locAvrgs = createAvrgModels(this.predictionFields);
     this.linregs = createLinRegModels(this.predictionFields, this.horizons, this.featureSpace)
     this.errorModels = createErrorModels(this.predictionFields, this.horizons, this.errorMetrics);
@@ -121,9 +104,10 @@ Model.prototype.update = function (rec) {
         
         for (var horizonIdx in this.horizons) {
             // Get rec for training
-            //var trainRecId = rec.$store.getStreamAggr(RecordBuffers[horizonIdx].name).val.oldest.$id; //OLD
-            var trainRecId = rec.$store.getStreamAggr(RecordBuffers[horizonIdx].name).val.oldest.$id;
-            
+            //var trainRecId = rec.$store.getStreamAggr(this.recordBuffers[horizonIdx].name).val.oldest.$id;
+            var trainRecId = this.recordBuffers[this.horizons[horizonIdx]].val.oldest.$id;
+            // New: var trainRecId = this.recordBuffers.buffers[horizonIdx].val.odlest.$id;
+
             if (trainRecId > 0) {
                 
                 var trainRec = this.store[trainRecId];
@@ -160,7 +144,8 @@ Model.prototype.predict = function (rec) {
         
     for (var horizonIdx in this.horizons) {
         // Get rec for training
-        var trainRecId = rec.$store.getStreamAggr(RecordBuffers[horizonIdx].name).val.oldest.$id;
+        //var trainRecId = rec.$store.getStreamAggr(this.recordBuffers[horizonIdx].name).val.oldest.$id;
+        var trainRecId = this.recordBuffers[this.horizons[horizonIdx]].val.oldest.$id;
             
         // Get prediction interval and time
         var predInter = Math.abs(rec.DateTime - rec.$store[trainRecId].DateTime);
@@ -174,7 +159,8 @@ Model.prototype.predict = function (rec) {
         var predictionRec = {};
         predictionRec.OriginalTime = rec.DateTime.toISOString(); //predictionRec.OriginalTime = rec.DateTime.string;
         predictionRec.PredictionTime = predTime.toISOString(); //predictionRec.PredictionTime = predTime.string;
-        predictionRec.PredictionHorizon = RecordBuffers[horizonIdx].horizon - 1;
+        //predictionRec.PredictionHorizon = this.recordBuffers[horizonIdx].horizon - 1;
+        predictionRec.PredictionHorizon = this.horizons[horizonIdx];
         predictionRec.UpdateCount = this.linregs[0][horizonIdx][work][hour].updateCount;
             
         for (var predictionFieldIdx in this.predictionFields) {
@@ -206,7 +192,8 @@ Model.prototype.evaluate = function (rec) {
         
     for (var horizonIdx in this.horizons) {
             
-        var trainRecId = rec.$store.getStreamAggr(RecordBuffers[horizonIdx].name).val.oldest.$id;
+        //var trainRecId = rec.$store.getStreamAggr(this.recordBuffers[horizonIdx].name).val.oldest.$id;
+        var trainRecId = this.recordBuffers[this.horizons[horizonIdx]].val.oldest.$id;
         var trainRec = rec.$store[trainRecId]
         
         for (var errorMetricIdx in this.errorMetrics) {
@@ -244,7 +231,8 @@ Model.prototype.consoleReport = function (rec) {
     
     for (horizonIdx in this.horizons) {
         
-        var trainRecId = rec.$store.getStreamAggr(RecordBuffers[horizonIdx].name).val.oldest.$id;
+        //var trainRecId = rec.$store.getStreamAggr(this.recordBuffers[horizonIdx].name).val.oldest.$id;
+        var trainRecId = this.recordBuffers[this.horizons[horizonIdx]].val.oldest.$id;
         var trainRec = rec.$store[trainRecId]
         
         // Only one report per day
@@ -289,14 +277,23 @@ Model.prototype.consoleReport = function (rec) {
      
 }
 
-Model.prototype.save = function (rec) { 
-    // TODO
-    console.warn('.save()_not implemented yet')
+Model.prototype.save = function (dirName) {
+    dirName = typeof dirName !== 'undefined' ? dirName : __dirname;
+    logger.info("Saving model state...");
+    
+    // if sensorId is defined create a subdirectory undefined 
+    if (typeof this.sensorId !== 'undefined') {
+        dirName = path.join(dirName, this.sensorId)
+    }
+    
+    modelBuffers.save(this.recordBuffers, dirName);
 }
 
-Model.prototype.load = function (rec) {
-    // TODO
-    console.warn('.load()_not implemented yet')
+Model.prototype.load = function (dirName) {
+    dirName = typeof dirName !== 'undefined' ? dirName : __dirname;
+    logger.info("Loading model state...");
+    
+    modelBuffers.load(this.recordBuffers, dirName);
 }
 
 // Exports
