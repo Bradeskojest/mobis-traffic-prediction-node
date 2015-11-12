@@ -1,4 +1,5 @@
 ﻿var qm = require('qminer');
+var logger = require("../../logger/logger.js");
 var path = require('path');
 
 createBuffers = function (horizons, store) {
@@ -18,8 +19,6 @@ createBuffers = function (horizons, store) {
 
 // save buffer state
 saveState = function (buffers, dirName) {
-    dirName = typeof dirName !== 'undefined' ? dirName : __dirname;
-
     // check if dirName exists, if not, create it
     if (!qm.fs.exists(dirName)) qm.fs.mkdir(dirName);
 
@@ -33,12 +32,11 @@ saveState = function (buffers, dirName) {
             fout.close();
         }
     }
+    logger.info('Saved buffer model states')
 };
 
 // load buffer state
 loadState = function (buffers, dirName) {
-    dirName = typeof dirName !== 'undefined' ? dirName : __dirname;
-
     // load each buffer aggregate
     for (var property in buffers) {
         if (buffers.hasOwnProperty(property)) {
@@ -48,6 +46,7 @@ loadState = function (buffers, dirName) {
             buffer.load(fin);
         }
     }
+    logger.info('Loaded buffer model states')
 };
 
 exports.create = createBuffers;

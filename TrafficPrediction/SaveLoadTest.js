@@ -147,11 +147,12 @@ function init(base, load) {
     function shutdown(base) {
         console.log(JSON.stringify(mobisModel.recordBuffers, false, 2)) // DEBUGING
         console.log(JSON.stringify(mobisModel.errorModels, false, 2)) // DEBUGING
+        console.log(JSON.stringify(mobisModel.locAvrgs, false, 2)) // DEBUGING
         console.log("Shuting down...");
         mobisModel.save(path.join(__dirname, './db/0011_11'));
         base.close();
     }
-
+    
     // register on close functions
     process.on('SIGINT', function () { shutdown(base); process.exit(); });
     process.on('SIGHUP', function () { shutdown(base); process.exit(); });

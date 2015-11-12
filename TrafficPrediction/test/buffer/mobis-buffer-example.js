@@ -1,7 +1,7 @@
 // import the qm module
 //var qm = require('qminer');
 var qm = require('../../../../../../cpp/QMiner/index.js');
-var modelBuffer = require('../../my_modules/utils/mobis-model/model-buffers.js');
+var modelBuffer = require('../../my_modules/utils/mobis-model/submodels/model-buffers.js');
 var path = require('path');
 
 // create a base with a simple store
@@ -36,13 +36,22 @@ for (i = 0; i < 20; i++) {
 console.log(JSON.stringify(recordBuffers, null, 2))
 
 // Saving all buffer aggregates state
-modelBuffer.save(recordBuffers);
+modelBuffer.save(recordBuffers, path.join(__dirname, './dbBuff'));
+
+// close base
+base.close();
 
 
 /////////////////////////////////////////////////////////////////////////
 // Testing Loading
 /////////////////////////////////////////////////////////////////////////
 
+// reopen base
+var base = new qm.Base({
+    mode: 'open', 
+    dbPath: path.join(__dirname, './dbBuff'),
+})
+var store = base.store('Heat');
 
 // Creating new buffer aggregates in order to test loading method
 var testBuffers = modelBuffer.create([1, 3, 6], store);
@@ -51,7 +60,7 @@ var testBuffers = modelBuffer.create([1, 3, 6], store);
 console.log(JSON.stringify(testBuffers, null, 2)); 
 
 // Testing loading buffer state to new buffers
-modelBuffer.load(testBuffers);
+modelBuffer.load(testBuffers, path.join(__dirname, './dbBuff'));
 
 //debugging
 console.log(JSON.stringify(testBuffers, null, 2));

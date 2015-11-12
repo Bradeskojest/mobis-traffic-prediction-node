@@ -11,18 +11,9 @@ var analytics = qm.analytics;
 var specialDates = new SpecialDates.newSpecialDates('Slovenian_holidays');
 var CalendarFtrs = SpecialDates.newCalendarFeatures();
 
-var modelBuffers = require('./model-buffers.js');
-var modelErrors = require('./model-errors.js');
-
-createAvrgModels = function (targetFields) {
-    // create set of locAvr models, for every target field
-    var avrgs = [];
-    targetFields.forEach(function (target, targetIdx) {
-        avrgs[targetIdx] = new LocalizedAverage({ fields: target.field });
-        avrgs[targetIdx]["predictionField"] = target.field.name;
-    })
-    return avrgs;
-}
+var modelBuffers = require('./submodels/model-buffers.js');
+var modelErrors = require('./submodels/model-errors.js');
+var modelAverages = require('./submodels/model-averages.js');
 
 createLinRegModels = function (fields, horizons, ftrSpace) {
     // create set of linear regression models 
@@ -72,9 +63,10 @@ var Model = function (modelConf) {
     this.evalOffset = (modelConf.otherParams.evaluationOffset == null) ? 50 : modelConf.otherParams.evaluationOffset;
     this.errorMetrics = modelConf.errorMetrics;
 
-    //this.recordBuffers = createBuffers(this.horizons, this.store);
     this.recordBuffers = modelBuffers.create(this.horizons, this.store);
-    this.locAvrgs = createAvrgModels(this.predictionFields);
+    //this.recordBuffers = createBuffers(this.horizons, this.store);
+    this.locAvrgs = modelAverages.create(this.predictionFields);
+    //this.locAvrgs = createAvrgModels(this.predictionFields);
     this.linregs = createLinRegModels(this.predictionFields, this.horizons, this.featureSpace)
     this.errorModels = modelErrors.create(this.predictionFields, this.horizons, this.errorMetrics)
     //this.errorModels = createErrorModels(this.predictionFields, this.horizons, this.errorMetrics);
@@ -263,24 +255,20 @@ Model.prototype.consoleReport = function (rec) {
 }
 
 Model.prototype.save = function (dirName) {
-    dirName = typeof dirName !== 'undefined' ? dirName : __dirname;
-    logger.info("Saving model state...");
-    
     // if sensorId is defined create a subdirectory undefined 
     if (typeof this.sensorId !== 'undefined') {
         dirName = path.join(dirName, this.sensorId)
     }
-    
+
     modelBuffers.save(this.recordBuffers, dirName);
     modelErrors.save(this.errorModels, this.predictionFields, this.horizons, this.errorMetrics, dirName);
+    modelAverages.save(this.locAvrgs, this.predictionFields, dirName);
 }
 
 Model.prototype.load = function (dirName) {
-    dirName = typeof dirName !== 'undefined' ? dirName : __dirname;
-    logger.info("Loading model state...");
-    
     modelBuffers.load(this.recordBuffers, dirName);
     modelErrors.load(this.errorModels, this.predictionFields, this.horizons, this.errorMetrics, dirName);
+    modelAverages.load(this.locAvrgs, this.predictionFields, dirName);
 }
 
 // Exports
