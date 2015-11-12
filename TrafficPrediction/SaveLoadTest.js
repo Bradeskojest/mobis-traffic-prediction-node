@@ -148,6 +148,7 @@ function init(base, load) {
         console.log(JSON.stringify(mobisModel.recordBuffers, false, 2)) // DEBUGING
         console.log(JSON.stringify(mobisModel.errorModels, false, 2)) // DEBUGING
         console.log(JSON.stringify(mobisModel.locAvrgs, false, 2)) // DEBUGING
+        console.log(JSON.stringify(mobisModel.linregs, false, 2)) // DEBUGING
         console.log("Shuting down...");
         mobisModel.save(path.join(__dirname, './db/0011_11'));
         base.close();

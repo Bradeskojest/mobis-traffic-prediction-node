@@ -19,11 +19,12 @@ saveState = function (avrgs, fields, dirName) {
     
     // iterate over all localizev averages, and save them one by one
     for (var avrIdx in avrgs) {
-        for (var i = 0; i < 2; i++) { // 2 models: working day or not
-            for (var j = 0; j < 24; j++) {
+        for (var workIdx = 0; workIdx < 2; workIdx++) { // 2 models: working day or not
+            for (var hourIdx = 0; hourIdx < 24; hourIdx++) {
                 debugger;
-                var avrgModel = avrgs[avrIdx].avrgs[i][j];
-                var name = avrgs[avrIdx].predictionField + "_workingday" + i + "_hour" + j
+                var avrgModel = avrgs[avrIdx].avrgs[workIdx][hourIdx];
+                var name = "averages_" + avrgs[avrIdx].predictionField + 
+                    "_workingday" + workIdx + "_hour" + hourIdx
                 var filePath = path.join(dirName, name);
                 var fout = new qm.fs.FOut(filePath);
                 avrgModel.save(fout);
@@ -38,10 +39,11 @@ saveState = function (avrgs, fields, dirName) {
 loadState = function (avrgs, fields, dirName) {
     // write all states to fout
     for (var avrIdx in avrgs) {
-        for (var i = 0; i < 2; i++) { // 2 models: working day or not
-            for (var j = 0; j < 24; j++) {
-                var avrgModel = avrgs[avrIdx].avrgs[i][j];
-                var name = avrgs[avrIdx].predictionField + "_workingday" + i + "_hour" + j
+        for (var workIdx = 0; workIdx < 2; workIdx++) { // 2 models: working day or not
+            for (var hourIdx = 0; hourIdx < 24; hourIdx++) {
+                var avrgModel = avrgs[avrIdx].avrgs[workIdx][hourIdx];
+                var name = "averages_" + avrgs[avrIdx].predictionField + 
+                    "_workingday" + workIdx + "_hour" + hourIdx
                 var filePath = path.join(dirName, name);
                 var fin = new qm.fs.FIn(filePath);
                 avrgModel.load(fin);

@@ -14,32 +14,7 @@ var CalendarFtrs = SpecialDates.newCalendarFeatures();
 var modelBuffers = require('./submodels/model-buffers.js');
 var modelErrors = require('./submodels/model-errors.js');
 var modelAverages = require('./submodels/model-averages.js');
-
-createLinRegModels = function (fields, horizons, ftrSpace) {
-    // create set of linear regression models 
-    var linregs = []; // this will be array of objects
-    for (var field in fields) { // models for prediction fields
-        linregs[field] = [];
-        linregs[field]["Model"] = { "field": fields[field].field.name };
-        for (var horizon in horizons) { // models for horizons
-            linregs[field][horizon] = [];
-            linregs[field][horizon]["Model"] = {"horizon": horizons[horizon]};
-            for (var i = 0; i < 2; i++) { // 2 models: working day or not
-                linregs[field][horizon][i] = [];
-                linregs[field][horizon][i]["Model"] = { "WorkingDay": Boolean(i) }
-                for (var j = 0; j < 24; j++) { // 24 models: for every hour in day
-                    linregs[field][horizon][i][j] = new analytics.RecLinReg({ "dim": ftrSpace.dim, "forgetFact": 1, "regFact": 10000 });
-                    linregs[field][horizon][i][j]["predictionField"] = fields[field].field.name;
-                    linregs[field][horizon][i][j]["horizon"] = horizons[horizon];
-                    linregs[field][horizon][i][j]["workingDay"] = i; // asign new field "workingDay" to model (just for demonstrational use)
-                    linregs[field][horizon][i][j]["forHour"] = j; // asign new field "forHour" to model (just for demonstrational use)
-                    linregs[field][horizon][i][j]["updateCount"] = 0; // how many times model was updated (just for demonstrational use)
-                }
-            }
-        }
-    }
-    return linregs;
-};
+var modelLinRegs = require('./submodels/model-linregs.js');
 
 ///////////////////////////////// 
 // LOCALIZED LINEAR REGRESSION //
@@ -67,7 +42,8 @@ var Model = function (modelConf) {
     //this.recordBuffers = createBuffers(this.horizons, this.store);
     this.locAvrgs = modelAverages.create(this.predictionFields);
     //this.locAvrgs = createAvrgModels(this.predictionFields);
-    this.linregs = createLinRegModels(this.predictionFields, this.horizons, this.featureSpace)
+    this.linregs = modelLinRegs.create(this.predictionFields, this.horizons, this.featureSpace)
+    //this.linregs = createLinRegModels(this.predictionFields, this.horizons, this.featureSpace)
     this.errorModels = modelErrors.create(this.predictionFields, this.horizons, this.errorMetrics)
     //this.errorModels = createErrorModels(this.predictionFields, this.horizons, this.errorMetrics);
 }
@@ -256,19 +232,19 @@ Model.prototype.consoleReport = function (rec) {
 
 Model.prototype.save = function (dirName) {
     // if sensorId is defined create a subdirectory undefined 
-    if (typeof this.sensorId !== 'undefined') {
-        dirName = path.join(dirName, this.sensorId)
-    }
-
+    if (typeof this.sensorId !== 'undefined') { dirName = path.join(dirName, this.sensorId) };
+    
     modelBuffers.save(this.recordBuffers, dirName);
     modelErrors.save(this.errorModels, this.predictionFields, this.horizons, this.errorMetrics, dirName);
     modelAverages.save(this.locAvrgs, this.predictionFields, dirName);
+    modelLinRegs.save(this.linregs, this.predictionFields, this.horizons, dirName);
 }
 
 Model.prototype.load = function (dirName) {
     modelBuffers.load(this.recordBuffers, dirName);
     modelErrors.load(this.errorModels, this.predictionFields, this.horizons, this.errorMetrics, dirName);
     modelAverages.load(this.locAvrgs, this.predictionFields, dirName);
+    modelLinRegs.load(this.linregs, this.predictionFields, this.horizons, dirName);
 }
 
 // Exports

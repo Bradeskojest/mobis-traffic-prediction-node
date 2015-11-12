@@ -26,7 +26,8 @@ saveState = function (buffers, dirName) {
     for (var property in buffers) {
         if (buffers.hasOwnProperty(property)) {
             var buffer = buffers[property];
-            var filePath = path.join(dirName, buffer.name);
+            var name = "buffer_" + buffer.name;
+            var filePath = path.join(dirName, name);
             var fout = qm.fs.openWrite(filePath);
             buffer.save(fout);
             fout.close();
@@ -41,7 +42,8 @@ loadState = function (buffers, dirName) {
     for (var property in buffers) {
         if (buffers.hasOwnProperty(property)) {
             var buffer = buffers[property];
-            var filePath = path.join(dirName, buffer.name);
+            var name = "buffer_" + buffer.name;
+            var filePath = path.join(dirName, name);
             var fin = qm.fs.openRead(filePath);
             buffer.load(fin);
         }
