@@ -23,7 +23,7 @@ describe('Loading/Saving mobisModel buffer aggregates', function () {
     var store = base.store('Heat');
 
     // Create buffer aggregates
-    var recordBuffers = modelBuffer.createBuffers([1, 3, 6], store);
+    var recordBuffers = modelBuffer.create([1, 3, 6], store);
     
     // Send some dummy data to the store
     for (i = 0; i < 20; i++) {
@@ -34,13 +34,13 @@ describe('Loading/Saving mobisModel buffer aggregates', function () {
     var firstState = JSON.stringify(recordBuffers);
     
     // Saving all buffer aggregates state
-    modelBuffer.saveState(recordBuffers);
+    modelBuffer.save(recordBuffers);
 
     // Creating new buffer aggregates in order to test loading method
-    var testBuffers = createBuffers([1, 3, 6], store);
+    var testBuffers = modelBuffer.create([1, 3, 6], store);
 
     // Testing loading buffer state to new buffers
-    modelBuffer.loadState(testBuffers);
+    modelBuffer.load(testBuffers);
 
     // Saving state before saving and loading again
     var loadedState = JSON.stringify(testBuffers);

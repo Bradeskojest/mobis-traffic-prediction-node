@@ -50,6 +50,6 @@ loadState = function (buffers, dirName) {
     }
 };
 
-exports.createBuffers = createBuffers;
+exports.create = createBuffers;
 exports.save = saveState;
 exports.load = loadState;

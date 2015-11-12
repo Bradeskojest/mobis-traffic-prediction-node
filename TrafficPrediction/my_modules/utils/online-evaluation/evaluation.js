@@ -18,153 +18,270 @@
  */
 
 // object for online metrics model
-function createOnlineMetric(updateCallback) {
+function createOnlineMetric(callback) {
     var error = -1;
-    var calcError = new updateCallback();
-    // update function defined with callback function
-    this.update = function (true_num, pred_num, ref_num) {
-        var pred_num = pred_num == null ? 0 : pred_num;
-        var ref_num = ref_num == null ? 0 : ref_num;
-
-        error = calcError.update(true_num, pred_num);
+    this.metric = new callback(); // We can hide this later (just delete this)
+    
+    // check if input types are of correct type
+    function checkPushParams() {
+        for (var i = 0, j = arguments.length; i < j; i++) {
+            var argumentType = arguments[i].constructor.name;
+            if (argumentType !== "Number") {
+                throw new TypeError('input param ' + i + ' must be of type "Number", but is ' + argumentType + ' instead');
+            }
+        }
     }
-    // getter for error
+    
+    /**
+    * Updates metric with ground truth target value `yTrue` and estimated target value `yPred`.
+    * @param {number} yTrue - Ground truth (correct) target value
+    * @param {number} yPred - Estimated target value
+    */
+    this.push = function (yTrue, yPred, ref_num) {
+        // set default values of optional input parameters
+        var yPred = yPred == null ? 0 : yPred;
+        var ref_num = ref_num == null ? 0 : ref_num;
+        // check if input types are of correct type
+        checkPushParams(yTrue, yPred, ref_num);
+        // calculate the error with provided function from the callback function
+        error = this.metric.update(yTrue, yPred);
+    }
+    
+    /**
+    * Returns error value.
+    * @returns {number} Error value
+    */
     this.getError = function () {
         return error;
     }
-    return this;
+    
+    /**
+    * TODO
+    * @returns TODO
+    */
+    this.save = function (fout) {
+        fout.writeJson(this.metric.state);
+        fout.flush();
+        fout.close();
+        return fout;
+    }
+    
+    /**
+    * TODO
+    * @returns TODO
+    */
+    this.load = function (fin) {
+        this.metric.state = fin.readJson();
+        error = this.metric.state.error;
+        fin.close();
+        return fin;
+    }
+
 }
 
-//////////// MEAN ERROR (ME)
-//#- `me = evaluation.newMeanError()` -- create new (online) mean error instance.
-//#   - `me.update(true_num, pred_num)` -- updates metric with ground truth target value `true_num` and estimated target value `pred_num`.
-//#   - `num = me.getError()` -- returns current error `num`
-exports.newMeanError = function () {
-    function calcError() {
-        this.sumErr = 0;
-        this.count = 0;
+// MEAN ERROR (ME)
+/**
+* Create new (online) mean error instance.
+* @class
+* @classdesc Online Mean Error (ME) instance 
+* @extends module:analytics~createOnlineMetric
+*/
+exports.MeanError = function (fin) {
+    function metric() {
+        this.name = "Mean Error"
+        this.shortName = "ME"
+        this.state = {
+            sumErr: 0,
+            count: 0,
+            error: 0
+        }
         // update function
-        this.update = function (true_num, pred_num) {
-            var err = true_num - pred_num;
-            this.sumErr += err;
-            this.count++;
-            var error = this.sumErr / this.count;
-            return error;
+        this.update = function (yTrue, yPred) {
+            var err = yTrue - yPred;
+            this.state.sumErr += err;
+            this.state.count++;
+            this.state.error = this.state.sumErr / this.state.count;
+            return this.state.error;
         }
     }
-    return new createOnlineMetric(calcError);
-}
+    // create new metric instance, and load state from fin in defined
+    var errorMetric = new createOnlineMetric(metric);
+    if (typeof fin !== 'undefined') errorMetric.load(fin);
 
-//////////// MEAN ABSOLUTE ERROR (MAE)
-//#- `mae = evaluation.newMeanAbsoluteError()` -- create new (online) mean absolute error instance.
-//#   - `mae.update(true_num, pred_num)` -- updates metric with ground truth target value `true_num` and estimated target value `pred_num`.
-//#   - `num = mae.getError()` -- returns current error `num`
-exports.newMeanAbsoluteError = function () {
-    function calcError () {
-        this.sumErr = 0;
-        this.count = 0;
+    return errorMetric;
+};
+
+// MEAN ABSOLUTE ERROR (MAE)
+/**
+* Create new (online) mean absolute error instance.
+* @class
+* @classdesc Online Mean Absolute Error (MAE) instance 
+* @extends module:analytics~createOnlineMetric
+*/
+exports.MeanAbsoluteError = function (fin) {
+    function metric() {
+        this.name = "Mean Absolute Error"
+        this.shortName = "MAE"
+        this.state = {
+            sumErr: 0,
+            count: 0,
+            error: 0
+        }
         // update function
-        this.update = function (true_num, pred_num) {
-            var err = true_num - pred_num;
-            this.sumErr += Math.abs(err);
-            this.count++;
-            var error = this.sumErr / this.count;
-            return error;
+        this.update = function (yTrue, yPred) {
+            var err = yTrue - yPred;
+            this.state.sumErr += Math.abs(err);
+            this.state.count++;
+            this.state.error = this.state.sumErr / this.state.count;
+            return this.state.error;
         }
     }
-    return new createOnlineMetric(calcError);
+    // create new metric instance, and load state from fin in defined
+    var errorMetric = new createOnlineMetric(metric);
+    if (typeof fin !== 'undefined') errorMetric.load(fin);
+
+    return errorMetric;
 }
 
-//////////// MEAN SQUARE ERROR (MSE)
-//#- `mse = evaluation.newMeanSquareError()` -- create new (online) mean square error instance.
-//#   - `mse.update(true_num, pred_num)` -- updates metric with ground truth target value `true_num` and estimated target value `pred_num`.
-//#   - `num = mse.getError()` -- returns current error `num`
-exports.newMeanSquareError = function () {
-    function calcError() {
-        this.sumErr = 0;
-        this.count = 0;
+// MEAN SQUARE ERROR (MSE)
+/**
+* Create new (online) mean square error instance.
+* @class
+* @classdesc Online Mean Square Error (MSE) instance 
+* @extends module:analytics~createOnlineMetric
+*/
+exports.MeanSquareError = function (fin) {
+    function metric() {
+        this.name = "Mean Square Error"
+        this.shortName = "MSE"
+        this.state = {
+            sumErr: 0,
+            count: 0,
+            error: 0
+        }
         // update function
-        this.update = function (true_num, pred_num) {
-            var err = true_num - pred_num;
-            this.sumErr += (err*err);
-            this.count++;
-            var error = this.sumErr / this.count;
-            return error;
+        this.update = function (yTrue, yPred) {
+            var err = yTrue - yPred;
+            this.state.sumErr += (err * err);
+            this.state.count++;
+            this.state.error = this.state.sumErr / this.state.count;
+            return this.state.error;
         }
     }
-    return new createOnlineMetric(calcError);
+    // create new metric instance, and load state from fin in defined
+    var errorMetric = new createOnlineMetric(metric);
+    if (typeof fin !== 'undefined') errorMetric.load(fin);
+    
+    return errorMetric;
 }
 
-//////////// ROOT MEAN SQUARE ERROR (RMSE)
-//#- `rmse = evaluation.newRootMeanSquareError()` -- create new (online) root mean square error instance.
-//#   - `rmse.update(true_num, pred_num)` -- updates metric with ground truth target value `true_num` and estimated target value `pred_num`.
-//#   - `num = rmse.getError()` -- returns current error `num`
-exports.newRootMeanSquareError = function () {
-    function calcError() {
-        this.sumErr = 0;
-        this.count = 0;
+// ROOT MEAN SQUARE ERROR (RMSE)
+/**
+* Create new (online) root mean square error instance.
+* @class
+* @classdesc Online Root Mean Square Error (RMSE) instance 
+* @extends module:analytics~createOnlineMetric
+*/
+exports.RootMeanSquareError = function (fin) {
+    function metric() {
+        this.name = "Root Mean Square Error"
+        this.shortName = "RMSE"
+        this.state = {
+            sumErr: 0,
+            count: 0,
+            error: 0
+        }
         // update function
-        this.update = function (true_num, pred_num) {
-            var err = true_num - pred_num;
-            this.sumErr += (err * err);
-            this.count++;
-            var error = this.sumErr / this.count;
-            return Math.sqrt(error);
+        this.update = function (yTrue, yPred) {
+            var err = yTrue - yPred;
+            this.state.sumErr += (err * err);
+            this.state.count++;
+            this.state.error = Math.sqrt(this.state.sumErr / this.state.count);
+            return this.state.error;
         }
     }
-    return new createOnlineMetric(calcError);
+    // create new metric instance, and load state from fin in defined
+    var errorMetric = new createOnlineMetric(metric);
+    if (typeof fin !== 'undefined') errorMetric.load(fin);
+    
+    return errorMetric;
 }
 
-//////////// MEAN ABSOLUTE PERCENTAGE ERROR (MAPE)
-//#- `mape = evaluation.newMeanAbsolutePercentageError()` -- create new (online) mean absolute percentage error instance.
-//#   - `mape.update(true_num, pred_num)` -- updates metric with ground truth target value `true_num` and estimated target value `pred_num`.
-//#   - `num = mape.getError()` -- returns current error `num`
-exports.newMeanAbsolutePercentageError = function () {
-    function calcError() {
-        this.sumErr = 0;
-        this.count = 0;
+// MEAN ABSOLUTE PERCENTAGE ERROR (MAPE)
+/**
+* Create new (online) mean absolute percentage error instance.
+* @class
+* @classdesc Online Mean Absolute Percentage Error (MAPE) instance 
+* @extends module:analytics~createOnlineMetric
+*/
+exports.MeanAbsolutePercentageError = function (fin) {
+    function metric() {
+        this.name = "Mean Absolute Percentage Error"
+        this.shortName = "MAPE"
+        this.state = {
+            sumErr: 0,
+            count: 0,
+            error: 0
+        }
         // update function
-        this.update = function (true_num, pred_num) {           
-            if (true_num != 0) { // skip if true_num is 0, otherwise we have devision by zero in the next step.
-                var err = true_num - pred_num;
-                this.sumErr += Math.abs(err / true_num) * 100;
+        this.update = function (yTrue, yPred) {
+            if (yTrue != 0) { // skip if yTrue is 0, otherwise we have devision by zero in the next step.
+                var err = yTrue - yPred;
+                this.state.sumErr += Math.abs(err / yTrue) * 100;
             }
-            this.count++;
-            var error = this.sumErr / this.count;
-            return error;
+            this.state.count++;
+            this.state.error = this.state.sumErr / this.state.count;
+            return this.state.error;
         }
     }
-    return new createOnlineMetric(calcError);
+    // create new metric instance, and load state from fin in defined
+    var errorMetric = new createOnlineMetric(metric);
+    if (typeof fin !== 'undefined') errorMetric.load(fin);
+    
+    return errorMetric;
 }
 
-//////////// R SQUARED SCORE (R2)
-//#- `r2 = evaluation.newRSquareScore()` -- create new (online) R Square instance. This statistic measures how successful the fit is in explaining the variation of the data. Best possible score is 1.0, lower values are worse.
-//#   - `r2.update(num)` -- updates metric with ground truth target value `true_num` and estimated target value `pred_num`.
-//#   - `num = rmse.getError()` -- returns current score `num`
-exports.newRSquareScore = function () {
-    function rSquare() {
-        this.sst = 0;
-        this.sse = 0;
-        this.mean = 0;
-        this.count = 0;
-        this.sumTrue = 0;
-        this.sumTrue2 = 0;
+// R SQUARED SCORE (R2)
+/**
+* Create new (online) R Square instance. This statistic measures how successful the fit is in explaining the variation of the data. Best possible score is 1.0, lower values are worse.
+* @class
+* @classdesc Online R Squared (R2) score instance 
+* @extends module:analytics~createOnlineMetric
+*/
+exports.R2Score = function (fin) {
+    function metric() {
+        this.name = "R2 Score"
+        this.shortName = "R2"
+        this.state = {
+            sst: 0,
+            sse: 0,
+            mean: 0,
+            count: 0,
+            sumTrue: 0,
+            sumTrue2: 0,
+            error: 0
+        }
         // update function
-        this.update = function (true_num, pred_num) {
-            this.count++;
-            this.sumTrue += true_num;
-            this.sumTrue2 += true_num * true_num;
-            this.mean = this.sumTrue / this.count;
+        this.update = function (yTrue, yPred) {
+            this.state.count++;
+            this.state.sumTrue += yTrue;
+            this.state.sumTrue2 += yTrue * yTrue;
+            this.state.mean = this.state.sumTrue / this.state.count;
             //calculate R squared score 
-            this.sse += (true_num - pred_num) * (true_num - pred_num);
-            this.sst = this.sumTrue2 - this.count * this.mean * this.mean;
-            if (this.sst == 0.0) {
-                return (this.sse == 0.0) ? 1.0 : 0.0;
+            this.state.sse += (yTrue - yPred) * (yTrue - yPred);
+            this.state.sst = this.state.sumTrue2 - this.state.count * this.state.mean * this.state.mean;
+            if (this.state.sst == 0.0) {
+                return (this.state.sse == 0.0) ? 1.0 : 0.0;
             }
-            return 1 - this.sse / this.sst;           
+            this.state.error = 1 - this.state.sse / this.state.sst;
+            return this.state.error;
         }
     }
-    return new createOnlineMetric(rSquare);
+    // create new metric instance, and load state from fin in defined
+    var errorMetric = new createOnlineMetric(metric);
+    if (typeof fin !== 'undefined') errorMetric.load(fin);
+    
+    return errorMetric;
 }
 
 // About this module

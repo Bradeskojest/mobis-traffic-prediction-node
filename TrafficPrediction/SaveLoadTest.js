@@ -83,10 +83,10 @@ function init(base, load) {
         
         //recLinRegParameters: { "dim": ftrSpace.dim, "forgetFact": 1, "regFact": 10000 }, // Not used yet. //Have to think about it how to use this
         errorMetrics: [
-            { name: "MAE", constructor: function () { return evaluation.newMeanAbsoluteError() } },
-            { name: "RMSE", constructor: function () { return evaluation.newRootMeanSquareError() } },
-            { name: "MAPE", constructor: function () { return evaluation.newMeanAbsolutePercentageError() } },
-            { name: "R2", constructor: function () { return evaluation.newRSquareScore() } }
+            { name: "MAE", constructor: function () { return new evaluation.MeanAbsoluteError() } },
+            { name: "RMSE", constructor: function () { return new evaluation.RootMeanSquareError() } },
+            { name: "MAPE", constructor: function () { return new evaluation.MeanAbsolutePercentageError() } },
+            { name: "R2", constructor: function () { return new evaluation.R2Score() } }
         ]
     }
     
@@ -139,10 +139,14 @@ function init(base, load) {
         saveJson: function () { return {} }
     });
     
+    debugger
+
+    
     // TODO: how can I move this somewhere outside??
     // shutdown function
     function shutdown(base) {
         console.log(JSON.stringify(mobisModel.recordBuffers, false, 2)) // DEBUGING
+        console.log(JSON.stringify(mobisModel.errorModels, false, 2)) // DEBUGING
         console.log("Shuting down...");
         mobisModel.save(path.join(__dirname, './db/0011_11'));
         base.close();
@@ -240,7 +244,7 @@ function createBase(mode) {
 
 // read input script argument for mode type. Default is "cleanCreate"
 var scriptArgs = (process.argv[2] == null) ? "cleanCreateLoad" : process.argv[2];
-var base = createBase(scriptArgs)
+var base = createBase(scriptArgs);
 
 debugger
 

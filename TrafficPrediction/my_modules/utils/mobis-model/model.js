@@ -12,6 +12,7 @@ var specialDates = new SpecialDates.newSpecialDates('Slovenian_holidays');
 var CalendarFtrs = SpecialDates.newCalendarFeatures();
 
 var modelBuffers = require('./model-buffers.js');
+var modelErrors = require('./model-errors.js');
 
 createAvrgModels = function (targetFields) {
     // create set of locAvr models, for every target field
@@ -49,23 +50,6 @@ createLinRegModels = function (fields, horizons, ftrSpace) {
     return linregs;
 };
 
-createErrorModels = function (fields, horizons, errMetrics) {
-    var errorModels = [];
-    for (var field in fields) {
-        errorModels[field] = [];
-        for (var horizon in horizons) {
-            errorModels[field][horizon] = [];
-            for (var errMetric in errMetrics) {
-                errorModels[field][horizon][errMetric] = errMetrics[errMetric].constructor();
-                errorModels[field][horizon][errMetric]["MetricName"] = errMetrics[errMetric].name;
-                errorModels[field][horizon][errMetric]["PredictionField"] = fields[field].field.name;
-            };
-        };
-    }
-    return errorModels;
-};
-
-
 ///////////////////////////////// 
 // LOCALIZED LINEAR REGRESSION //
 ///////////////////////////////// 
@@ -89,10 +73,11 @@ var Model = function (modelConf) {
     this.errorMetrics = modelConf.errorMetrics;
 
     //this.recordBuffers = createBuffers(this.horizons, this.store);
-    this.recordBuffers = modelBuffers.createBuffers(this.horizons, this.store);
+    this.recordBuffers = modelBuffers.create(this.horizons, this.store);
     this.locAvrgs = createAvrgModels(this.predictionFields);
     this.linregs = createLinRegModels(this.predictionFields, this.horizons, this.featureSpace)
-    this.errorModels = createErrorModels(this.predictionFields, this.horizons, this.errorMetrics);
+    this.errorModels = modelErrors.create(this.predictionFields, this.horizons, this.errorMetrics)
+    //this.errorModels = createErrorModels(this.predictionFields, this.horizons, this.errorMetrics);
 }
 
 Model.prototype.update = function (rec) {
@@ -206,7 +191,7 @@ Model.prototype.evaluate = function (rec) {
                 var errorModel = this.errorModels[predictionFieldIdx][horizonIdx][errorMetricIdx];
                 var prediction = trainRec.Predictions[horizonIdx][predictionFieldName];
                 // update model and write to errRec
-                errorModel.update(rec[predictionFieldName], prediction);
+                errorModel.push(rec[predictionFieldName], prediction);
                 errRec[predictionFieldName] = errorModel.getError();
             }
             
@@ -287,6 +272,7 @@ Model.prototype.save = function (dirName) {
     }
     
     modelBuffers.save(this.recordBuffers, dirName);
+    modelErrors.save(this.errorModels, this.predictionFields, this.horizons, this.errorMetrics, dirName);
 }
 
 Model.prototype.load = function (dirName) {
@@ -294,6 +280,7 @@ Model.prototype.load = function (dirName) {
     logger.info("Loading model state...");
     
     modelBuffers.load(this.recordBuffers, dirName);
+    modelErrors.load(this.errorModels, this.predictionFields, this.horizons, this.errorMetrics, dirName);
 }
 
 // Exports

@@ -25,7 +25,7 @@ var store = base.store('Heat');
 
 
 // Create buffer aggregates
-var recordBuffers = modelBuffer.createBuffers([1, 3, 6], store);
+var recordBuffers = modelBuffer.create([1, 3, 6], store);
 
 // Send some dummy data to the store
 for (i = 0; i < 20; i++) {
@@ -45,7 +45,7 @@ modelBuffer.save(recordBuffers);
 
 
 // Creating new buffer aggregates in order to test loading method
-var testBuffers = modelBuffer.createBuffers([1, 3, 6], store);
+var testBuffers = modelBuffer.create([1, 3, 6], store);
 
 // debugging - should be empty
 console.log(JSON.stringify(testBuffers, null, 2)); 

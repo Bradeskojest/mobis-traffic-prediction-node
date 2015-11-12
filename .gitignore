@@ -6093,3 +6093,11 @@ $RECYCLE.BIN/
 /TrafficPrediction/sandbox/measurements_obvoznica.txt
 /TrafficPrediction/sandbox/specialDates.txt
 /TrafficPrediction/sandbox/specialDays.txt
+/TrafficPrediction/test/buffer/buffer-example-old.js
+/TrafficPrediction/test/buffer/buffer-example.js
+/TrafficPrediction/test/buffer/buffer-test-old.js
+/TrafficPrediction/test/buffer/buffer-test.js
+/TrafficPrediction/test/buffer/buffer
+/TrafficPrediction/test/buffer/test
+/TrafficPrediction/test/metrics/binary
+/TrafficPrediction/test/metrics/me
