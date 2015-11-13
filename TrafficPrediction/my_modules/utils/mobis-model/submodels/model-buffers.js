@@ -21,33 +21,32 @@ createBuffers = function (horizons, store) {
 saveState = function (buffers, dirName) {
     // check if dirName exists, if not, create it
     if (!qm.fs.exists(dirName)) qm.fs.mkdir(dirName);
-
+    // open file in write mode
+    var fout = new qm.fs.FOut(path.join(dirName, "buffers_model")); 
     // save each buffer aggregate   
     for (var property in buffers) {
         if (buffers.hasOwnProperty(property)) {
             var buffer = buffers[property];
-            var name = "buffer_" + buffer.name;
-            var filePath = path.join(dirName, name);
-            var fout = qm.fs.openWrite(filePath);
             buffer.save(fout);
-            fout.close();
         }
     }
+    fout.flush();
+    fout.close();
     logger.info('Saved buffer model states')
 };
 
 // load buffer state
 loadState = function (buffers, dirName) {
+    // open file in read mode
+    var fin = new qm.fs.FIn(path.join(dirName, "buffers_model")); 
     // load each buffer aggregate
     for (var property in buffers) {
         if (buffers.hasOwnProperty(property)) {
             var buffer = buffers[property];
-            var name = "buffer_" + buffer.name;
-            var filePath = path.join(dirName, name);
-            var fin = qm.fs.openRead(filePath);
             buffer.load(fin);
         }
     }
+    fin.close();
     logger.info('Loaded buffer model states')
 };
 

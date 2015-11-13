@@ -25,40 +25,36 @@ createErrorModels = function (fields, horizons, errMetrics) {
 saveState = function (errorModels, fields, horizons, errMetrics, dirName) {
     // check if dirName exists, if not, create it
     if (!qm.fs.exists(dirName)) qm.fs.mkdir(dirName);
-    
+    // open file in write mode
+    var fout = new qm.fs.FOut(path.join(dirName, "errors_model")); 
     // write all states to fout
     for (var fieldIdx in fields) { 
         for (var horizonIdx in horizons) {
             for (var errorMetricIdx in errMetrics) {
                 var errorModel = errorModels[fieldIdx][horizonIdx][errorMetricIdx];
-                var name = "error_" + fields[fieldIdx].field.name + "_horizon" + 
-                    horizons[horizonIdx] + "_" + errMetrics[errorMetricIdx].name
-                var filePath = path.join(dirName, name);
-                var fout = new qm.fs.FOut(filePath);
                 errorModel.save(fout);
-                fout.close();
             }
         }
     }
+    fout.flush();
+    fout.close();
     logger.info('Saved error model states')
 };
 
 // load buffer state
 loadState = function (errorModels, fields, horizons, errMetrics, dirName) {
+    // open file in read mode
+    var fin = new qm.fs.FIn(path.join(dirName, "errors_model"));
     // write all states to fout
     for (var fieldIdx in fields) {
         for (var horizonIdx in horizons) {
             for (var errorMetricIdx in errMetrics) {
                 var errorModel = errorModels[fieldIdx][horizonIdx][errorMetricIdx];
-                var name = "error_" + fields[fieldIdx].field.name + "_horizon" + 
-                    horizons[horizonIdx] + "_" + errMetrics[errorMetricIdx].name
-                var filePath = path.join(dirName, name);
-                var fin = new qm.fs.FIn(filePath);
                 errorModel.load(fin);
-                fin.close();
             }
         }
     }
+    fin.close();
     logger.info('Loaded error model states')
 };
 

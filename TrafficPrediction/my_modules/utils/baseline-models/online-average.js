@@ -24,8 +24,6 @@ Average.prototype.getAvr = function () {
 // save current state
 Average.prototype.save = function (fout) {
     fout.writeJson(this);
-    fout.flush();
-    fout.close();
     return fout;
 }
 
@@ -34,7 +32,6 @@ Average.prototype.load = function (fin) {
     var loadedState = fin.readJson();
     this.updateCount = loadedState.updateCount; 
     this.avr = loadedState.avr;
-    fin.close();
     return fin;
 }
 

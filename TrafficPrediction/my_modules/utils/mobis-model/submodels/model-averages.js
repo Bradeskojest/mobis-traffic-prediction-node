@@ -16,41 +16,36 @@ createLocAvrModels = function (targetFields) {
 saveState = function (avrgs, fields, dirName) {
     // check if dirName exists, if not, create it
     if (!qm.fs.exists(dirName)) qm.fs.mkdir(dirName);
-    
+    // open file in write mode
+    var fout = new qm.fs.FOut(path.join(dirName, "averages_model")); 
     // iterate over all localizev averages, and save them one by one
     for (var avrIdx in avrgs) {
         for (var workIdx = 0; workIdx < 2; workIdx++) { // 2 models: working day or not
             for (var hourIdx = 0; hourIdx < 24; hourIdx++) {
-                debugger;
                 var avrgModel = avrgs[avrIdx].avrgs[workIdx][hourIdx];
-                var name = "averages_" + avrgs[avrIdx].predictionField + 
-                    "_workingday" + workIdx + "_hour" + hourIdx
-                var filePath = path.join(dirName, name);
-                var fout = new qm.fs.FOut(filePath);
                 avrgModel.save(fout);
-                fout.close();
             }
         }
     }
+    fout.flush();
+    fout.close();
     logger.info('Saved local average model states')
 };
 
 // load buffer state
 loadState = function (avrgs, fields, dirName) {
+    // open file in read mode
+    var fin = new qm.fs.FIn(path.join(dirName, "averages_model")); 
     // write all states to fout
     for (var avrIdx in avrgs) {
         for (var workIdx = 0; workIdx < 2; workIdx++) { // 2 models: working day or not
             for (var hourIdx = 0; hourIdx < 24; hourIdx++) {
                 var avrgModel = avrgs[avrIdx].avrgs[workIdx][hourIdx];
-                var name = "averages_" + avrgs[avrIdx].predictionField + 
-                    "_workingday" + workIdx + "_hour" + hourIdx
-                var filePath = path.join(dirName, name);
-                var fin = new qm.fs.FIn(filePath);
                 avrgModel.load(fin);
-                fin.close();
             }
         }
     }
+    fin.close();
     logger.info('Loaded local average model states')
 };
 
