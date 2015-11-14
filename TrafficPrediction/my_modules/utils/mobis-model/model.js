@@ -241,6 +241,9 @@ Model.prototype.save = function (dirName) {
 }
 
 Model.prototype.load = function (dirName) {
+    // if sensorId is defined create a subdirectory undefined 
+    if (typeof this.sensorId !== 'undefined') { dirName = path.join(dirName, this.sensorId) }    ;
+    
     modelBuffers.load(this.recordBuffers, dirName);
     modelErrors.load(this.errorModels, this.predictionFields, this.horizons, this.errorMetrics, dirName);
     modelAverages.load(this.locAvrgs, this.predictionFields, dirName);

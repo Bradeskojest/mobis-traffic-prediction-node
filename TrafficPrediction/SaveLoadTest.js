@@ -9,7 +9,7 @@
 var qm = require('../../../../cpp/QMiner/index.js');
 var path = require('path');
 var server = require('./server/server.js');
-var evaluation = require('./my_modules/utils/online-evaluation/evaluation.js')
+var evaluation = qm.analytics.metrics;
 
 // Import my modules
 Utils = {};

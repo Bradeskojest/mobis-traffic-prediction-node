@@ -3,9 +3,10 @@
 */
 
 // Import modules
-var qm = require('qminer');
+//var qm = require('qminer');
+var qm = require('../../../../cpp/QMiner/index.js');
 var path = require('path');
-var evaluation = require('./my_modules/utils/online-evaluation/evaluation.js')
+var evaluation = qm.analytics.metrics;
 var logger = require("./my_modules/utils/logger/logger.js");
 
 // Import my modules
@@ -25,7 +26,7 @@ Model = require('./my_modules/utils/mobis-model/model.js')
 init = function (base) {
     
     //////// INIT STORES ////////
-
+    // create schema if not in open or openReadOnly' mode
     var CounterNode = Utils.DefineStores.createNodeStore(base);
     var Stores = Utils.DefineStores.createMeasurementStores(base);
     
@@ -99,10 +100,10 @@ init = function (base) {
             
             //recLinRegParameters: { "dim": ftrSpace.dim, "forgetFact": 1, "regFact": 10000 }, // Not used yet. //Have to think about it how to use this
             errorMetrics: [
-                { name: "MAE", constructor: function () { return evaluation.newMeanAbsoluteError() } },
-                { name: "RMSE", constructor: function () { return evaluation.newRootMeanSquareError() } },
-                { name: "MAPE", constructor: function () { return evaluation.newMeanAbsolutePercentageError() } },
-                { name: "R2", constructor: function () { return evaluation.newRSquareScore() } }
+                { name: "MAE", constructor: function () { return new evaluation.MeanAbsoluteError() } },
+                { name: "RMSE", constructor: function () { return new evaluation.RootMeanSquareError() } },
+                { name: "MAPE", constructor: function () { return new evaluation.MeanAbsolutePercentageError() } },
+                { name: "R2", constructor: function () { return new evaluation.R2Score() } }
             ]
         }
         
@@ -181,15 +182,15 @@ init = function (base) {
                 var mobisModel = mobisModels[id];
                 
                 mobisModel.predict(rec);
-                //mobisModel.update(rec);
-                //mobisModel.evaluate(rec);
-                //mobisModel.consoleReport(rec);
+                mobisModel.update(rec);
+                mobisModel.evaluate(rec);
+                mobisModel.consoleReport(rec);
                                 
                 // do not update if the gap between last record and resampled record is bigger than 2 hours
                 var lastId = (trafficStore.length > 2) ? trafficStore.length - 2 : 0
                 if (rec.DateTime - trafficStore[lastId].DateTime <= 2 * 60 * 60 * 1000) {
 
-                    //mobisModel.predict(rec);
+                    mobisModel.predict(rec);
                     mobisModel.update(rec);
                     mobisModel.evaluate(rec);
                     mobisModel.consoleReport(rec);
@@ -201,7 +202,8 @@ init = function (base) {
         });
 
     });
-    
+
+    return mobisModels;
 }
 
 // Export function for loading recs from loadStore according to DateTime
