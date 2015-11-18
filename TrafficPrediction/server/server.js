@@ -11,6 +11,8 @@ var server = undefined;
 function init(base) {
     var express = require('express');
     app = express();
+
+    app.use(express.static("./public"));
     app.use(bodyParser.json());
     
     app.use(require('morgan')("combined", { "stream": logger.stream }));
