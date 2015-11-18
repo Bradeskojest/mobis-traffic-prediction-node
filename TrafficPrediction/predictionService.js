@@ -19,6 +19,8 @@ function cleanCreateMode() {
     // Init traffic prediction work flow
     trafficPrediction.init(base); //Initiate the traffic prediction workflow
     
+    //TODO: we should probably clear backup here
+    
     return base;
 }
 
@@ -129,7 +131,7 @@ function start(mode) {
     //setInterval(function () { trafficPrediction.backup(true) }, 5000);
 
     // create backup before running server
-    trafficPrediction.backup(true);
+    //trafficPrediction.backup(true);
 
     logger.info("\x1b[32m[Model] Service started in '%s' mode\n\x1b[0m", mode);
     

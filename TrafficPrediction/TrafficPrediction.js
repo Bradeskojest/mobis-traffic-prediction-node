@@ -189,15 +189,15 @@ TrafficPrediction.prototype.initAggregates = function () {
                 var mobisModel = this.mobisModels[id];
                 
                 mobisModel.predict(rec);
-                mobisModel.update(rec);
-                mobisModel.evaluate(rec);
-                mobisModel.consoleReport(rec);
+                //mobisModel.update(rec);
+                //mobisModel.evaluate(rec);
+                //mobisModel.consoleReport(rec);
                 
                 // do not update if the gap between last record and resampled record is bigger than 2 hours
                 var lastId = (trafficStore.length > 2) ? trafficStore.length - 2 : 0
                 if (rec.DateTime - trafficStore[lastId].DateTime <= 2 * 60 * 60 * 1000) {
                     
-                    mobisModel.predict(rec);
+                    //mobisModel.predict(rec);
                     mobisModel.update(rec);
                     mobisModel.evaluate(rec);
                     mobisModel.consoleReport(rec);
@@ -257,7 +257,7 @@ TrafficPrediction.prototype.backup = function (reopen) {
     var reopen = (typeof reopen === 'undefined') ? false : reopen;
     
     logger.info("Creating backup...");
-
+    
     // save state and close base
     // shutdown first (close and save) before backuping
     if (!this.base.isClosed()) this.shutdown();
