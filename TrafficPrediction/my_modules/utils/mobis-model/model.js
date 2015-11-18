@@ -39,13 +39,9 @@ var Model = function (modelConf) {
     this.errorMetrics = modelConf.errorMetrics;
 
     this.recordBuffers = modelBuffers.create(this.horizons, this.store);
-    //this.recordBuffers = createBuffers(this.horizons, this.store);
     this.locAvrgs = modelAverages.create(this.predictionFields);
-    //this.locAvrgs = createAvrgModels(this.predictionFields);
     this.linregs = modelLinRegs.create(this.predictionFields, this.horizons, this.featureSpace)
-    //this.linregs = createLinRegModels(this.predictionFields, this.horizons, this.featureSpace)
     this.errorModels = modelErrors.create(this.predictionFields, this.horizons, this.errorMetrics)
-    //this.errorModels = createErrorModels(this.predictionFields, this.horizons, this.errorMetrics);
 }
 
 Model.prototype.update = function (rec) {
