@@ -76,7 +76,6 @@
             
             //console.log("Getting rec with id: " + id + ", Timestamp: " + rec.DateTime.toISOString());
             //console.log("Saving it to store: " + trafficStore.name);
-
             trafficStore.push(rec.toJSON(true));
         } else {
             targetStores[lowestRecIdx].push(rec.toJSON(true));

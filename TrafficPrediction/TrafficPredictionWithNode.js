@@ -5,7 +5,8 @@
 */
  
 // Import modules
-var qm = require('qminer');
+//var qm = require('qminer');
+var qm = require('../../../../cpp/QMiner/index.js');
 var path = require('path');
 var server = require('./server/server.js');
 var evaluation = require('./my_modules/utils/online-evaluation/evaluation.js')
@@ -26,10 +27,10 @@ qm.delLock();
 var base = new qm.Base({
     mode: 'createClean', 
     schemaPath: 'sensors.def',
-    //dbPath: path.join(__dirname, './db')
-    dbPath: path.join('./db')
+    dbPath: path.join(__dirname, './db')
+    //dbPath: path.join('./db')
 })
-
+debugger
 var CounterNode = base.store("CounterNode");
 var Evaluation = base.store("Evaluation");
 var Predictions = base.store("Predictions");
@@ -38,12 +39,10 @@ var trafficStore = base.store('trafficStore');
 //var mergedStore = base.store('mergedStore'); 
 var resampledStore = base.store('resampledStore');
 
-
-
 // This is used by feature extractor, and updated from MobisModel
 var avrVal = Utils.Helper.newDummyModel();
 
-////////////////////////////// DEFINING FEATURE SPACE //////////////////////////////
+////////////////////////////// DEFINING MODEL CONFIGURATION //////////////////////////////
 var modelConf = {
     base: base,
     locAvr: avrVal, // Not sure if this is ok, has to be debuged
@@ -101,7 +100,7 @@ var modelConf = {
     ]
 }
 
-
+// create new MobiS model
 var mobisModel = new Model(modelConf);
 
 
@@ -126,7 +125,6 @@ trafficStore.addStreamAggr({
     createStore: false, interval: resampleInterval
 });
 
-// TODO: strange: this part throws errors if executed directly from node
 // Ads a join back, since it was lost with resampler
 resampledStore.addStreamAggr({
     name: "addJoinsBack",
@@ -134,8 +132,6 @@ resampledStore.addStreamAggr({
         rec.$addJoin("measuredBy", trafficStore.last.measuredBy)
     },
     saveJson: function () { return {} }
-
-    //saveJson: function () { }
 })
 
 
@@ -145,11 +141,8 @@ resampledStore.addStreamAggr({
     onAdd: function (rec) {
         
         mobisModel.predict(rec);
-        
         mobisModel.update(rec);
-        
         mobisModel.evaluate(rec);
-        
         mobisModel.consoleReport(rec);
 
     },
@@ -157,18 +150,17 @@ resampledStore.addStreamAggr({
 });
 
 
-
-///////////////////// LOADING DATA: SIMULATING DATA FLOW /////////////////////
+///////////////// LOADING DATA: SIMULATING DATA FLOW /////////////////////
 // Load stores
 qm.load.jsonFile(base.store("CounterNode"), "./sandbox/countersNodes.txt");
-//qm.load.jsonFile(base.store('trafficLoadStore'), "./sandbox/measurements_0011_11.txt");
 qm.load.jsonFile(base.store('trafficStore'), "./sandbox/measurements_0011_11.txt");
+
+//qm.load.jsonFile(base.store('trafficLoadStore'), "./sandbox/measurements_0011_11.txt");
 //qm.load.jsonFileLimit(base.store('trafficLoadStore'), "./sandbox/measurements_0011_11.txt",1000);
 
-// Simultaing data flow (later this shuld be replaced by imputor)
+// Simultaing data flow (used if we model more than one sensor)
 //Utils.Data.importData([trafficLoadStore], [trafficStore]);
 //Utils.Data.importData([trafficLoadStore], [trafficStore], 10000);
-
 
 console.log(trafficStore.allRecords.length); // DEBUGING
 console.log("Max speed:" + resampledStore.last.measuredBy.MaxSpeed); //DEBUGING

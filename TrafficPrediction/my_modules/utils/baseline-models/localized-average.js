@@ -25,11 +25,12 @@ LocalizedAverages.prototype.getVal = function (rec) {
 var createLocalizedAvrgs = function () {
     // create 2 * 24 avr models, for every hour, and for working/nonworking day
     avrgs = [];
-    for (var i = 0; i < 2; i++) { // 2 models: working day or not
-        avrgs[i] = [];
-        for (var j = 0; j < 24; j++) {
-            avrgs[i][j] = new OnlineAverage();
-            avrgs[i][j]["forHour"] = j; // asign new field "forHour" to model
+    for (var workIdx = 0; workIdx < 2; workIdx++) { // 2 models: working day or not
+        avrgs[workIdx] = [];
+        avrgs[workIdx]["workingDay"] = workIdx;
+        for (var hourIdx = 0; hourIdx < 24; hourIdx++) {
+            avrgs[workIdx][hourIdx] = new OnlineAverage();
+            avrgs[workIdx][hourIdx]["forHour"] = hourIdx; // asign new field "forHour" to model
         }
     }
     return avrgs;
@@ -43,20 +44,3 @@ var selectAvr = function (rec) {
 }
 
 module.exports = LocalizedAverages;
-
-//exports.newLocAvrgs = function (conf) {
-
-//    var field = conf.fields;
-
-//    var hours = (conf.includeHours == true) ? true : false;
-//    var days = (conf.includeDaysOfWeek == true) ? true : false;
-//    var working = (conf.includeWorkingDays == true) ? true : false;
-
-//    return new locAvrgs(field, hours, days, working);
-//}
-
-// About this module
-//exports.about = function () {
-//    var description = "Module with baseline predictions.";
-//    return description;
-//};

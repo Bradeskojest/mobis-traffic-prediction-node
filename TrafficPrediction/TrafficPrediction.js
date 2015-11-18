@@ -3,9 +3,10 @@
 */
 
 // Import modules
-var qm = require('qminer');
+//var qm = require('qminer');
+var qm = require('../../../../cpp/QMiner/index.js');
 var path = require('path');
-var evaluation = require('./my_modules/utils/online-evaluation/evaluation.js')
+var evaluation = qm.analytics.metrics;
 var logger = require("./my_modules/utils/logger/logger.js");
 
 // Import my modules
@@ -16,40 +17,56 @@ Utils.Helper = require('./my_modules/utils/helper.js')
 Utils.DefineStores = require('./my_modules/utils/define-stores/sensor-stores.js')
 Model = require('./my_modules/utils/mobis-model/model.js')
 
-//qm.delLock();
-//var base = new qm.Base({
-//    mode: 'createClean', 
-//    dbPath: path.join(__dirname, './db')
-//})
 
-init = function (base) {
-    
+var TrafficPrediction = function () {
+    this.base;
+    this.mobisModels = {};
+    this.sensorIds;
+    this.stores;
+    this.pathDb = path.join(__dirname, './db');
+    this.pathBackup = path.join(__dirname, './backup')
+}
+
+TrafficPrediction.prototype.init = function (base) {
+    this.initStores(base);
+    this.initModels();
+    this.initAggregates();
+}
+
+TrafficPrediction.prototype.initStores = function (base) {
     //////// INIT STORES ////////
+    this.base = base;
 
-    var CounterNode = Utils.DefineStores.createNodeStore(base);
-    var Stores = Utils.DefineStores.createMeasurementStores(base);
+    // create schema if not in open or openReadOnly' mode
+    var counterNodes = Utils.DefineStores.createNodeStore(base);
+    this.stores = Utils.DefineStores.createMeasurementStores(base);
     
-    var sensorIds = CounterNode.map(function (sensor) { return sensor.Name.replace("-", "_") })
+    // sensor ids
+    this.sensorIds = counterNodes.map(function (sensor) { return sensor.Name.replace("-", "_") })
     
-    
+    // shutdown properly when service is closed
+    process.on('SIGINT', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
+    process.on('SIGHUP', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
+    process.on('uncaughtException', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
+}
+
+TrafficPrediction.prototype.initModels = function () {
     //////// INIT MOBIS MODELS ////////
-    
     // This is used by feature extractor, and updated from MobisModel
     var avrVal = Utils.Helper.newDummyModel();
-    var mobisModels = {};
     
-    sensorIds.forEach(function (sensorId) {
-        
+    this.sensorIds.forEach(function (sensorId) {
         // Prepare store references
-        var trafficStore = Stores.trafficStores[sensorId];
-        var resampledStore = Stores.resampledStores[sensorId];
-        var Evaluation = Stores.evaluationStores[sensorId];
-        var Predictions = Stores.predictionStores[sensorId];
-        //var mergedStore = Stores.mergedStores[sensorId];
+        var trafficStore = this.stores.trafficStores[sensorId];
+        var resampledStore = this.stores.resampledStores[sensorId];
+        var Evaluation = this.stores.evaluationStores[sensorId];
+        var Predictions = this.stores.predictionStores[sensorId];
+        //var mergedStore = this.stores.mergedStores[sensorId];
         
         // Define model configurations
         var modelConf = {
-            base: base,
+            base : this.base,
+            sensorId: sensorId,
             locAvr: avrVal, // Not sure if this is ok, has to be debuged
             stores: {
                 "sourceStore": resampledStore,
@@ -84,8 +101,6 @@ init = function (base) {
                 { field: resampledStore.field("Speed") },
             ],
             
-            //ftrSpace: ftrSpace, //TODO: Later this will be done automatically
-            
             target: resampledStore.field("NumOfCars"),
             
             otherParams: {
@@ -98,10 +113,10 @@ init = function (base) {
             
             //recLinRegParameters: { "dim": ftrSpace.dim, "forgetFact": 1, "regFact": 10000 }, // Not used yet. //Have to think about it how to use this
             errorMetrics: [
-                { name: "MAE", constructor: function () { return evaluation.newMeanAbsoluteError() } },
-                { name: "RMSE", constructor: function () { return evaluation.newRootMeanSquareError() } },
-                { name: "MAPE", constructor: function () { return evaluation.newMeanAbsolutePercentageError() } },
-                { name: "R2", constructor: function () { return evaluation.newRSquareScore() } }
+                { name: "MAE", constructor: function () { return new evaluation.MeanAbsoluteError() } },
+                { name: "RMSE", constructor: function () { return new evaluation.RootMeanSquareError() } },
+                { name: "MAPE", constructor: function () { return new evaluation.MeanAbsolutePercentageError() } },
+                { name: "R2", constructor: function () { return new evaluation.R2Score() } }
             ]
         }
         
@@ -116,28 +131,27 @@ init = function (base) {
         mobisModel["predictionStore"] = modelConf.stores.predictionStore;
         mobisModel["evaluationStore"] = modelConf.stores.evaluationStore;
         
-        mobisModels[sensorId] = mobisModel;
-    });
-    
+        this.mobisModels[sensorId] = mobisModel;
+    }, this);
+}
 
+TrafficPrediction.prototype.initAggregates = function () {
     //////// INIT STREAM AGGREGATES ////////
-
-    sensorIds.forEach(function (sensorId) {
+    this.sensorIds.forEach(function (sensorId) {
         
         logger.info("\n[Stream Aggregate] Adding Stream Aggregates for sensor: " + sensorId);
         
         // Prepare store references
-        var trafficStore = Stores.trafficStores[sensorId];
-        var resampledStore = Stores.resampledStores[sensorId];
-        var Evaluation = Stores.evaluationStores[sensorId];
-        var Predictions = Stores.predictionStores[sensorId];
+        var trafficStore = this.stores.trafficStores[sensorId];
+        var resampledStore = this.stores.resampledStores[sensorId];
+        var Evaluation = this.stores.evaluationStores[sensorId];
+        var Predictions = this.stores.predictionStores[sensorId];
         
         //////// PREPROCESSING ////////
         // Todo
         
-
-        //////// RESAMPLER ////////
         
+        //////// RESAMPLER ////////
         logger.info("[Stream Aggregate] adding Resampler");
         
         var resampleInterval = 60 * 60 * 1000;
@@ -153,9 +167,7 @@ init = function (base) {
             createStore: false, interval: resampleInterval
         });
         
-        
         //////// ADD JOINS BACK ////////
-        
         logger.info("[Stream Aggregate] adding addJoinsBack");
         
         // Ads a join back, since it was lost with resampler
@@ -167,49 +179,133 @@ init = function (base) {
             saveJson: function () { return {} }
         })
         
-        
         //////// ANALYTICS ////////
-        
         logger.info("[Stream Aggregate] adding Analytics");
         
         resampledStore.addStreamAggr({
             name: "analytics",
             onAdd: function (rec) {
-                
                 var id = rec.measuredBy.Name.replace("-", "_")
-                var mobisModel = mobisModels[id];
+                var mobisModel = this.mobisModels[id];
                 
                 mobisModel.predict(rec);
-                //mobisModel.update(rec);
-                //mobisModel.evaluate(rec);
-                //mobisModel.consoleReport(rec);
-                                
+                mobisModel.update(rec);
+                mobisModel.evaluate(rec);
+                mobisModel.consoleReport(rec);
+                
                 // do not update if the gap between last record and resampled record is bigger than 2 hours
                 var lastId = (trafficStore.length > 2) ? trafficStore.length - 2 : 0
                 if (rec.DateTime - trafficStore[lastId].DateTime <= 2 * 60 * 60 * 1000) {
-
-                    //mobisModel.predict(rec);
+                    
+                    mobisModel.predict(rec);
                     mobisModel.update(rec);
                     mobisModel.evaluate(rec);
                     mobisModel.consoleReport(rec);
                     
                 }
 
-            },
+            }.bind(this),
             saveJson: function () { return {} }
         });
 
-    });
+    }, this);
+}
+
+// load each model aggregate
+TrafficPrediction.prototype.saveState = function (path) { 
+    var path = (typeof path === 'undefined') ? this.pathDb : path
+    for (var sensorId in this.mobisModels) {
+        if (this.mobisModels.hasOwnProperty(sensorId)) {
+            var model = this.mobisModels[sensorId];
+            logger.info("\nSaving model states for sensor " + sensorId);
+            model.save(path);
+        }
+    }
+}
+
+// load each model aggregate
+TrafficPrediction.prototype.loadState = function (path) {
+    var path = (typeof path === 'undefined') ? this.pathDb : path
+    for (var sensorId in this.mobisModels) {
+        if (this.mobisModels.hasOwnProperty(sensorId)) {
+            var model = this.mobisModels[sensorId];
+            logger.info("\nLoading model states for sensor " + sensorId);
+            model.load(path);
+        }
+    }
+}
+
+TrafficPrediction.prototype.shutdown = function () {
+    // debugging purpuses - delete it later
+    //logger.debug(JSON.stringify(this.mobisModels['0178_12'].recordBuffers, false, 2))
+    //logger.debug(JSON.stringify(this.mobisModels['0178_12'].errorModels, false, 2))
+    //logger.debug(JSON.stringify(this.mobisModels['0178_12'].locAvrgs, false, 2))
+    //logger.debug(JSON.stringify(this.mobisModels['0178_12'].linregs, false, 2))
     
+    if (!this.base.isClosed()) {
+        logger.info("Shutting down...");
+        this.saveState();
+        this.base.close();
+        logger.info("Model state is saved. Base is closed.");
+    } else { 
+        logger.debug("Base allready closed.")
+    }
+}
+
+TrafficPrediction.prototype.backup = function (reopen) {
+    // if true, reopen and relode state after backup
+    var reopen = (typeof reopen === 'undefined') ? false : reopen;
+    
+    logger.info("Creating backup...");
+
+    // save state and close base
+    // shutdown first (close and save) before backuping
+    if (!this.base.isClosed()) this.shutdown();
+    
+    // copy entire this.pathDb folder to this.pathBackup
+    logger.debug("Copying .db to .backup...")
+    var files = qm.fs.listFile(this.pathDb, null, true);
+    //var files = qm.fs.listFile(this.pathDb);
+    logger.debug("Number of files: " + files.length);
+    if (!qm.fs.exists(this.pathBackup)) qm.fs.mkdir(this.pathBackup)
+
+    files.forEach(function (file) {
+        var source = path.normalize(file);
+        var dest = source.replace(this.pathDb, this.pathBackup);
+        // copy file one by one
+        if (qm.fs.exists(file)) {
+            if (!qm.fs.exists(path.dirname(dest))) qm.fs.mkdir(path.dirname(dest));
+            qm.fs.copy(source, dest);
+        }
+    }, this);
+    logger.debug("Files copied.");
+    
+    logger.info("Backup created.");
+
+    //  if reopen flag is true - reopen and load from created backup
+    if (reopen) {
+        logger.info("Reopening model...");
+        // reopen saved base
+        var base = new qm.Base({
+            mode: 'open',
+            //dbPath: this.pathDb
+            dbPath: this.pathBackup // backup is not saved properly
+        })
+        base["mode"] = 'open';
+        
+        // load saved state
+        this.init(base);
+        this.loadState(this.pathBackup); // this should load from pathBackup
+        logger.info("Model reopened.");
+    }
 }
 
 // Export function for loading recs from loadStore according to DateTime
-importData = function (base, dataPath, limit) {
-    var loadStore = Utils.DefineStores.createLoadStore(base);
+TrafficPrediction.prototype.importData = function (dataPath, limit) {
+    var loadStore = Utils.DefineStores.createLoadStore(this.base);
     qm.load.jsonFile(loadStore, dataPath);
     Utils.Data.importData([loadStore], "", limit);
 }
-///////////////////// EXPORTS /////////////////////
 
-exports.init = init;
-exports.importData = importData;
+///////////////////// EXPORTS /////////////////////
+module.exports = TrafficPrediction;

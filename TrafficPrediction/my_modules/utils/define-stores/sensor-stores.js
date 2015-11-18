@@ -17,7 +17,11 @@ createLoadStore = function (base) {
         ]
     }
     
-    base.createStore(storeDef);
+    // create stores if base is opened in faCreate (1) mode
+    if (base.getStats().access == 1) {
+        base.createStore(storeDef);
+    }
+
     return base.store("LoadStore")
 }
 
@@ -56,8 +60,13 @@ createNodeStore = function (base) {
             { "field" : "Source", "type" : "value" }
         ]
     }
-
-    base.createStore(storeDef);
+    
+    // create stores if base is opened in faCreate (1) mode
+    if (base.getStats().access == 1) {
+        base.createStore(storeDef);     
+    }
+    
+    // load records
     qm.load.jsonFile(base.store('CounterNode'), path.join(__dirname , '../../../sandbox/countersNodes.txt'));
     
     // Load short version (only 5 nodes)
@@ -149,8 +158,11 @@ createMeasurementStores = function (base) {
                 ]
             }
         ];
-
-        base.createStore(storeDef)
+        
+        // create stores if base is opened in faCreate (1) mode
+        if (base.getStats().access == 1) {
+            base.createStore(storeDef);
+        }
 
         result.trafficStores[name] = base.store(trafficStoreNm);
         result.resampledStores[name] = base.store(resampledStoreNm);
