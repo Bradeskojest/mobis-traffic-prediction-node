@@ -167,7 +167,7 @@ Model.prototype.evaluate = function (rec) {
 }
 
 Model.prototype.consoleReport = function (rec) {
-    // TODO
+    // TODO: use logger instad of console.log
     
     if (rec.$id < this.evalOffset) return; // If condition is true, stop function here.
     

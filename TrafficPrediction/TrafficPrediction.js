@@ -203,14 +203,11 @@ TrafficPrediction.prototype.initAggregates = function () {
                     mobisModel.consoleReport(rec);
                     
                 }
-                
-                // testing partial flush - this is to much
-                //this.base.partialFlush();
-                //this.backup(true);
 
             }.bind(this),
             saveJson: function () { return {} }
         });
+
     }, this);
 }
 
@@ -261,12 +258,7 @@ TrafficPrediction.prototype.backup = function (reopen) {
     
     logger.info("Creating backup...");
 
-    // TODO use partial flush!!!!!
-
-    // TODO should I delete backup folder first (so that we have clean backup?)
-
     // save state and close base
-    debugger
     // shutdown first (close and save) before backuping
     if (!this.base.isClosed()) this.shutdown();
     
