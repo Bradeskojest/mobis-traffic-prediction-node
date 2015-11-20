@@ -97,7 +97,7 @@ function cleanCreateLoadMode() {
     //trafficPrediction.importData("./sandbox/measurements3sensors3months.txt")
     //trafficPrediction.importData("./sandbox/chunk1measurements3sensors3months.txt") // Small chuck of previous (from march on).
     //trafficPrediction.importData("./sandbox/measurements_obvoznica.txt")
-    trafficPrediction.importData("./sandbox/measurements_obvoznica_lite.txt")
+    trafficPrediction.importData("./sandbox/measurements_obvoznica_lite.txt", 2000)
     //trafficPrediction.importData("./sandbox/data-small.json")
 
     return base;

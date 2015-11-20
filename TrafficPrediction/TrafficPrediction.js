@@ -147,6 +147,9 @@ TrafficPrediction.prototype.initAggregates = function () {
         var Evaluation = this.stores.evaluationStores[sensorId];
         var Predictions = this.stores.predictionStores[sensorId];
         
+        // model
+        var model = this.mobisModels[sensorId];
+        
         //////// PREPROCESSING ////////
         // Todo
         
@@ -155,8 +158,8 @@ TrafficPrediction.prototype.initAggregates = function () {
         logger.info("[Stream Aggregate] adding Resampler");
         
         var resampleInterval = 60 * 60 * 1000;
-        trafficStore.addStreamAggr({
-            name: "Resampled", type: "resampler",
+        model['resampler'] = trafficStore.addStreamAggr({
+            name: "resampler", type: "resampler",
             outStore: resampledStore.name, timestamp: "DateTime",
             fields: [{ name: "NumOfCars", interpolator: "linear" },
                  { name: "Gap", interpolator: "linear" },
@@ -178,6 +181,7 @@ TrafficPrediction.prototype.initAggregates = function () {
             },
             saveJson: function () { return {} }
         })
+        debugger
         
         //////// ANALYTICS ////////
         logger.info("[Stream Aggregate] adding Analytics");
