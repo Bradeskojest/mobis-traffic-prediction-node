@@ -3,6 +3,7 @@ var qm = require('../../../../cpp/QMiner/index.js');
 var TrafficPrediction = require('./TrafficPrediction.js');
 var path = require('path');
 var logger = require("./my_modules/utils/logger/logger.js");
+Utils.Helper = require('./my_modules/utils/helper.js')
 
 var trafficPrediction = new TrafficPrediction();
 
@@ -12,14 +13,14 @@ function cleanCreateMode() {
     var base = new qm.Base({
         mode: 'createClean', 
         //schemaPath: path.join(__dirname, './store.def'), // its more robust but, doesen't work from the console (doesent know __dirname)
-        dbPath: path.join(__dirname, './db'),
+        dbPath: trafficPrediction.pathDb
     })
     base["mode"] = 'cleanCreate'
 
     // Init traffic prediction work flow
     trafficPrediction.init(base); //Initiate the traffic prediction workflow
     
-    //TODO: we should probably clear backup here
+    //TODO: we should probably clear backup here as well?
     
     return base;
 }
@@ -28,7 +29,7 @@ function cleanCreateMode() {
 function openMode() {
     var base = new qm.Base({
         mode: 'open',
-        dbPath: path.join(__dirname, './db') //If the code is copied in terminal, this has to commented out, since __dirname is not known from terminal
+        dbPath: trafficPrediction.pathDb
     })
     base["mode"] = 'open'
 
@@ -45,7 +46,7 @@ function openMode() {
 function readOnlyMode() {
     var base = new qm.Base({
         mode: 'openReadOnly',
-        dbpath: path.join(__dirname, './db')
+        dbpath: trafficPrediction.pathDb
     })
     base["mode"] = 'openReadOnly'
     
@@ -58,22 +59,12 @@ function readOnlyMode() {
     return base;
 }
 
-// create Base in OPEN FROM BACKUP mode
-function openFromBackup() {
-    //qm.delLock() // not sure yet if this will be necessary
-    var base = new qm.Base({
-        mode: 'open',
-        dbPath: path.join(__dirname, './backup') //If the code is copied in terminal, this has to commented out, since __dirname is not known from terminal
-    })
-    base["mode"] = 'openFromBackup'
-    
-    //Initiate the traffic prediction workflow
-    trafficPrediction.init(base);
-    
-    // load saved models
-    trafficPrediction.loadState(path.join(__dirname, './backup'));
-    
-    return base;
+function restoreFromBackup() {
+    // copy db from backup to db
+    Utils.Helper.copyFolder(trafficPrediction.pathBackup, trafficPrediction.pathDb);
+
+    // call openMode()
+    return openMode();
 }
 
 // create Base in CLEAN CREATE mode and load init data
@@ -82,7 +73,7 @@ function cleanCreateLoadMode() {
     var base = new qm.Base({
         mode: 'createClean', 
         //schemaPath: path.join(__dirname, './store.def'), // its more robust but, doesen't work from the console (doesent know __dirname)
-        dbPath: path.join(__dirname, './db'),
+        dbPath: trafficPrediction.pathDb
     })
     base["mode"] = 'cleanCreateLoad'
     
@@ -110,7 +101,7 @@ function start(mode) {
         'cleanCreateLoad': cleanCreateLoadMode,
         'open': openMode,
         'openReadOnly': readOnlyMode,
-        'openFromBackup': openFromBackup
+        'restoreFromBackup': restoreFromBackup
     };
     
     // check if mode type is valid

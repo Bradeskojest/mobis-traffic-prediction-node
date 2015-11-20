@@ -257,33 +257,16 @@ TrafficPrediction.prototype.shutdown = function () {
 }
 
 TrafficPrediction.prototype.backup = function (reopen) {
+    logger.info("Creating backup...");
+    
     // if true, reopen and relode state after backup
     var reopen = (typeof reopen === 'undefined') ? false : reopen;
     
-    logger.info("Creating backup...");
-    
-    // save state and close base
     // shutdown first (close and save) before backuping
     if (!this.base.isClosed()) this.shutdown();
     
-    // copy entire this.pathDb folder to this.pathBackup
-    logger.debug("Copying .db to .backup...")
-    var files = qm.fs.listFile(this.pathDb, null, true);
-    //var files = qm.fs.listFile(this.pathDb);
-    logger.debug("Number of files: " + files.length);
-    if (!qm.fs.exists(this.pathBackup)) qm.fs.mkdir(this.pathBackup)
-
-    files.forEach(function (file) {
-        var source = path.normalize(file);
-        var dest = source.replace(this.pathDb, this.pathBackup);
-        // copy file one by one
-        if (qm.fs.exists(file)) {
-            if (!qm.fs.exists(path.dirname(dest))) qm.fs.mkdir(path.dirname(dest));
-            qm.fs.copy(source, dest);
-        }
-    }, this);
-    logger.debug("Files copied.");
-    
+    // copy .db to .backup
+    Utils.Helper.copyFolder(this.pathDb, this.pathBackup);
     logger.info("Backup created.");
 
     //  if reopen flag is true - reopen and load from created backup

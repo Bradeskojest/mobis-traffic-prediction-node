@@ -165,7 +165,7 @@ function getSensors(horizon) {
 }
 
 function showSensor(sensor, horizon) {
-    var pin = "./images/pin_sensor_" + setMarkerColor(sensor, horizon) + ".png";
+    var pin = "./images/pin_sensor_" + setMarkerColor(sensor, horizon) + ".gif";
     // var image = new google.maps.MarkerImage(
     //         pin,
     //         null, /* size is determined at runtime */
@@ -231,7 +231,7 @@ function setMarkerColor(sensor, horizon) {
         speed = sensor.Predictions[horizon - 2 / 3 * horizon].Speed;
     }
     if (speed == 0) {
-        return "green";
+        return "error";
     }
     var deviance = 1 - speed / max;
     if (deviance <= green) {
