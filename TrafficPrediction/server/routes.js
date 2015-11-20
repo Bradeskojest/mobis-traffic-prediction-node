@@ -5,8 +5,8 @@ var auth = require('./auth.js');
 
 function setup(app, handlers) {
 
-    // http://mustang.ijs.si:9570/
-    app.get('/', handlers.service.handleGetRouterPaths.bind(handlers.service));
+    // http://mustang.ijs.si:9570/routes
+    app.get('/routes', handlers.service.handleGetRouterPaths.bind(handlers.service));
     // http://mustang.ijs.si:9570/close-base
     app.get('/close-base', auth, handlers.service.handleCloseBase.bind(handlers.service));
     
@@ -25,6 +25,9 @@ function setup(app, handlers) {
     
     // If you want to test from Simple REST Client, make sure you add in headers: Content-Type: application/json
     app.post('/traffic-predictions/add', handlers.trafficPrediction.handleAddMeasurement.bind(handlers.trafficPrediction));
+    
+    // http://mustang.ijs.si:9570/index.html
+    //app.get('/')
 
 }
 

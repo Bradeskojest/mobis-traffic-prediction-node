@@ -42,6 +42,7 @@ var Model = function (modelConf) {
     this.locAvrgs = modelAverages.create(this.predictionFields);
     this.linregs = modelLinRegs.create(this.predictionFields, this.horizons, this.featureSpace)
     this.errorModels = modelErrors.create(this.predictionFields, this.horizons, this.errorMetrics)
+    this.resampler;
 }
 
 Model.prototype.update = function (rec) {
@@ -234,6 +235,12 @@ Model.prototype.save = function (dirName) {
     modelErrors.save(this.errorModels, this.predictionFields, this.horizons, this.errorMetrics, dirName);
     modelAverages.save(this.locAvrgs, this.predictionFields, dirName);
     modelLinRegs.save(this.linregs, this.predictionFields, this.horizons, dirName);
+    
+    var fout = new qm.fs.FOut(path.join(dirName, this.resampler.name)); 
+    this.resampler.save(fout);
+    fout.flush();
+    fout.close();
+    logger.info('Saved resampler aggregate')
 }
 
 Model.prototype.load = function (dirName) {
@@ -244,6 +251,11 @@ Model.prototype.load = function (dirName) {
     modelErrors.load(this.errorModels, this.predictionFields, this.horizons, this.errorMetrics, dirName);
     modelAverages.load(this.locAvrgs, this.predictionFields, dirName);
     modelLinRegs.load(this.linregs, this.predictionFields, this.horizons, dirName);
+    
+    var fin = new qm.fs.FIn(path.join(dirName, this.resampler.name));
+    this.resampler.load(fin);
+    fin.close();
+    logger.info('Loaded resampler aggregate')
 }
 
 // Exports

@@ -147,6 +147,9 @@ TrafficPrediction.prototype.initAggregates = function () {
         var Evaluation = this.stores.evaluationStores[sensorId];
         var Predictions = this.stores.predictionStores[sensorId];
         
+        // model
+        var model = this.mobisModels[sensorId];
+        
         //////// PREPROCESSING ////////
         // Todo
         
@@ -155,8 +158,8 @@ TrafficPrediction.prototype.initAggregates = function () {
         logger.info("[Stream Aggregate] adding Resampler");
         
         var resampleInterval = 60 * 60 * 1000;
-        trafficStore.addStreamAggr({
-            name: "Resampled", type: "resampler",
+        model['resampler'] = trafficStore.addStreamAggr({
+            name: "resampler", type: "resampler",
             outStore: resampledStore.name, timestamp: "DateTime",
             fields: [{ name: "NumOfCars", interpolator: "linear" },
                  { name: "Gap", interpolator: "linear" },
@@ -178,6 +181,7 @@ TrafficPrediction.prototype.initAggregates = function () {
             },
             saveJson: function () { return {} }
         })
+        debugger
         
         //////// ANALYTICS ////////
         logger.info("[Stream Aggregate] adding Analytics");
@@ -189,15 +193,15 @@ TrafficPrediction.prototype.initAggregates = function () {
                 var mobisModel = this.mobisModels[id];
                 
                 mobisModel.predict(rec);
-                mobisModel.update(rec);
-                mobisModel.evaluate(rec);
-                mobisModel.consoleReport(rec);
+                //mobisModel.update(rec);
+                //mobisModel.evaluate(rec);
+                //mobisModel.consoleReport(rec);
                 
                 // do not update if the gap between last record and resampled record is bigger than 2 hours
                 var lastId = (trafficStore.length > 2) ? trafficStore.length - 2 : 0
                 if (rec.DateTime - trafficStore[lastId].DateTime <= 2 * 60 * 60 * 1000) {
                     
-                    mobisModel.predict(rec);
+                    //mobisModel.predict(rec);
                     mobisModel.update(rec);
                     mobisModel.evaluate(rec);
                     mobisModel.consoleReport(rec);
@@ -253,33 +257,16 @@ TrafficPrediction.prototype.shutdown = function () {
 }
 
 TrafficPrediction.prototype.backup = function (reopen) {
+    logger.info("Creating backup...");
+    
     // if true, reopen and relode state after backup
     var reopen = (typeof reopen === 'undefined') ? false : reopen;
     
-    logger.info("Creating backup...");
-
-    // save state and close base
     // shutdown first (close and save) before backuping
     if (!this.base.isClosed()) this.shutdown();
     
-    // copy entire this.pathDb folder to this.pathBackup
-    logger.debug("Copying .db to .backup...")
-    var files = qm.fs.listFile(this.pathDb, null, true);
-    //var files = qm.fs.listFile(this.pathDb);
-    logger.debug("Number of files: " + files.length);
-    if (!qm.fs.exists(this.pathBackup)) qm.fs.mkdir(this.pathBackup)
-
-    files.forEach(function (file) {
-        var source = path.normalize(file);
-        var dest = source.replace(this.pathDb, this.pathBackup);
-        // copy file one by one
-        if (qm.fs.exists(file)) {
-            if (!qm.fs.exists(path.dirname(dest))) qm.fs.mkdir(path.dirname(dest));
-            qm.fs.copy(source, dest);
-        }
-    }, this);
-    logger.debug("Files copied.");
-    
+    // copy .db to .backup
+    Utils.Helper.copyFolder(this.pathDb, this.pathBackup);
     logger.info("Backup created.");
 
     //  if reopen flag is true - reopen and load from created backup

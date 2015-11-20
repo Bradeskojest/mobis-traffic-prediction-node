@@ -1,11 +1,76 @@
 ﻿<!DOCTYPE html>
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
-    <meta charset="utf-8" />
-    <title></title>
+    <!--<meta http-equiv="refresh" content="30; URL=http://shodan.ijs.si:8000/fleet.html?user=TT">-->
+    <script src="https://maps-api-ssl.google.com/maps/api/js?key=AIzaSyABXHw-jGvuRNVXpwQck-MbMvu4frIlRMg"></script>
+
+    <!--JQUERY -->
+    <!--<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>-->
+    <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">-->
+    <!--<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>-->
+    <!-- include the jQuery and jQuery UI scripts -->
+    <script src="https://code.jquery.com/jquery-2.1.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+
+    <!-- plus a jQuery UI theme, here I use "flick" -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/flick/jquery-ui.css">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/jquery-ui-slider-pips.css">
+    <script src="js/sensors.js"></script>
+    <script src="js/jquery-ui-slider-pips.js"></script>
+
+
+    <!--Marker with label0-->
+    <script src="//google-maps-utility-library-v3.googlecode.com/svn/tags/markerwithlabel/1.0.1/src/markerwithlabel_packed.js"></script>
+
+
 </head>
+
 <body>
+    <div class="topBar">
+        <img style="display: inline;" src="./images/mobis.png" height="37px;" />
+        <img style="display: inline;" src="./images/optimum.png" height="37px;" />
+        <div class="topElement">
+            <label for="amount" class="prediction-picker">Prediction horizon [in hours]:</label>
+            <input type="text" id="amount" readonly style="border:0; color:#D11042; font-weight:bold;">
+        </div>
+        <div class="topSlider topElement">
+            <div id="slider-range-min"></div>
+        </div>
+        <button id="treshold-options-button">Show treshold options </button>
+    </div>
+
+    <div class="google-maps" id="googleMap"></div>
+
+    <div class="right-content">
+        <b>Lower tresholds (deviation[%]) </b>
+        <div class="tresholds">
+            <label for="green" class="tresholds">Normal traffic:</label>
+            <input type="text" class="tresholds" id="green" readonly style="border:0; font-weight:bold;">
+            <div id="slider-range-green" class="right-slider"></div>
+        </div>
+        <div class="tresholds">
+            <label for="yellow" class="tresholds">Increased traffic:</label>
+            <input type="text" class="tresholds" id="yellow" readonly style="border:0; font-weight:bold;">
+            <div id="slider-range-yellow" class="right-slider"></div>
+        </div>
+        <div class="tresholds">
+            <label for="orange" class="tresholds">Heavy traffic:</label>
+            <input type="text" class="tresholds" id="orange" readonly style="border:0; font-weight:bold;">
+            <div id="slider-range-orange" class="right-slider"></div>
+        </div>
+        <!--<input type="text" class="tresholds" id="alter" readonly style="border:0; font-weight:bold;">
+        <div id="alternating-slider"></div>-->
+    </div>
 
 </body>
+
+
+
+
 </html>
