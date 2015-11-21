@@ -17,7 +17,7 @@ Service is designed as [Node.js](https://nodejs.org/en/) web application, and th
 - npm **v2.11** or higher.
 
 ### Install 
-This repository contains 3 different services whit its own installat instructions:
+This repository contains 3 different services with instructions:
 - [TrafficPrediction]
     (https://github.com/bkazic/mobis-traffic-prediction-node/blob/master/TrafficPrediction/README.md) - 
     **TODO:** description
