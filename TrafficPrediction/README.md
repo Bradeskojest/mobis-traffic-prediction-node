@@ -23,7 +23,7 @@ There are different modes in which we can run the service:
   2. **cleanCreateLoadMode:** `npm start cleanCreateLoadMode` -  Service will create a new database and load the data defined in createBase.js file. Warning: all previous data in store will be deleted.
   3. **openMode:** `npm start openMode` - Service will open old database. If the base was not closed properly, this the service will not be able to start. In this case, `cleanCreate` mode has to be used.
   4. **readOnlyMode:** `npm start readOnlyMode` - Service will open database in READ ONLY mode. Meaning that it will not be possible to write new instances into the store. 
-  5. **openFromBackup:** `npm start openFromBackup` - Service will load database from backup.
+  5. **restoreFromBackup:** `npm start openFromBackup` - Service will load database from backup and copy it to db.
 
 ---
 
@@ -33,6 +33,6 @@ By default, service is started in `development` mode. If we want to run the serv
 
 Example:
 ```
-NODE_ENV=production&& npm start
+set NODE_ENV=production&& npm start
 ```
   
