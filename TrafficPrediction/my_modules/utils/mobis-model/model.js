@@ -1,6 +1,6 @@
 //Imports
-//var qm = require('qminer');
-var qm = require('../../../../../../../cpp/QMiner/index.js');
+var qm = require('qminer');
+//var qm = require('../../../../../../../cpp/QMiner/index.js');
 var logger = require("../logger/logger.js");
 var path = require('path');
 

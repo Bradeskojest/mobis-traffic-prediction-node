@@ -3,8 +3,8 @@
 */
 
 // Import modules
-//var qm = require('qminer');
-var qm = require('../../../../cpp/QMiner/index.js');
+var qm = require('qminer');
+//var qm = require('../../../../cpp/QMiner/index.js');
 var path = require('path');
 var evaluation = qm.analytics.metrics;
 var logger = require("./my_modules/utils/logger/logger.js");

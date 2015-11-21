@@ -1,5 +1,5 @@
-﻿//var qm = require('qminer');
-var qm = require('../../../../cpp/QMiner/index.js');
+﻿var qm = require('qminer');
+//var qm = require('../../../../cpp/QMiner/index.js');
 var server = require('./server/server.js');
 var predictionService = require('./predictionService.js');
 var env = process.env.NODE_ENV || 'development';

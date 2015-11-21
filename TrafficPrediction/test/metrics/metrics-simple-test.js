@@ -1,6 +1,6 @@
 ﻿// import the qm module
-//var qm = require('qminer');
-var qm = require('../../../../../../cpp/QMiner/index.js');
+var qm = require('qminer');
+//var qm = require('../../../../../../cpp/QMiner/index.js');
 var assert = require('assert');
 //var evaluation = require('../../my_modules/utils/online-evaluation/evaluation.js');
 var evaluation = qm.analytics.metrics

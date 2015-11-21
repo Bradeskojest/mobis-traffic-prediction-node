@@ -1,6 +1,6 @@
 // import the qm module
-//var qm = require('qminer');
-var qm = require('../../../../../../cpp/QMiner/index.js')
+var qm = require('qminer');
+//var qm = require('../../../../../../cpp/QMiner/index.js')
 var assert = require('assert');
 var path = require('path');
 
