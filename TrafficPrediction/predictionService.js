@@ -1,5 +1,5 @@
-﻿//var qm = require('qminer');
-var qm = require('../../../../cpp/QMiner/index.js');
+﻿var qm = require('qminer');
+//var qm = require('../../../../cpp/QMiner/index.js');
 var TrafficPrediction = require('./TrafficPrediction.js');
 var path = require('path');
 var logger = require("./my_modules/utils/logger/logger.js");
