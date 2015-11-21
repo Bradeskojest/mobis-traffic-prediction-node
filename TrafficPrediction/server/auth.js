@@ -12,6 +12,9 @@ var auth = function (req, res, next) {
     };
     
     var user = basicAuth(req);
+    
+    // check if cinfig.admins exist, if not, throw error to logger that admin is not defined
+    if (!config.hasOwnProperty("admins")) logger.error("Admins are not defined in config.json")
 
     // This is the shortest version. Not sure which one is better.
     if (user && config.admins[user.name] && config.admins[user.name].password === user.pass) {
