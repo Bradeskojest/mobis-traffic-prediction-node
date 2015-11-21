@@ -32,7 +32,7 @@ This repository contains 3 different services with instructions:
 ## Acknowledgments
 
 Traffic prediction service is developed by  by [AILab](http://ailab.ijs.si/) at 
-[Jozef Stefan Institute](http://www.ijs.si/) within MobiS FP7 EU Project  prototype with node.
+[Jozef Stefan Institute](http://www.ijs.si/).
 
 The authors would like to acknowledge funding from the European Union Seventh Framework Programme, 
 under Grant Agreements 318452 ([Mobis](https://sites.google.com/site/mobiseuprojecteu/)), and
