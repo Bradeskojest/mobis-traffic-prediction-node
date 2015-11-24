@@ -3,7 +3,10 @@
 */
 
 // Import modules
-var qm = require('qminer');
+var env = process.env.NODE_ENV || 'development';
+var config = require('./config.json')[env];
+var qm = require(config.qmPath);
+//var qm = require('qminer');
 //var qm = require('../../../../cpp/QMiner/index.js');
 var path = require('path');
 var evaluation = qm.analytics.metrics;
@@ -289,8 +292,11 @@ TrafficPrediction.prototype.backup = function (reopen) {
 
 // Export function for loading recs from loadStore according to DateTime
 TrafficPrediction.prototype.importData = function (dataPath, limit) {
+    console.log(); // just to make a new line in console
+    logger.info("Loading data...");
     var loadStore = Utils.DefineStores.createLoadStore(this.base);
     qm.load.jsonFile(loadStore, dataPath);
+    logger.info("Training models...");
     Utils.Data.importData([loadStore], "", limit);
 }
 

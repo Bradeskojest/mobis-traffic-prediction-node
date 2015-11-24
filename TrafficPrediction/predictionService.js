@@ -1,4 +1,7 @@
-﻿var qm = require('qminer');
+﻿var env = process.env.NODE_ENV || 'development';
+var config = require('./config.json')[env];
+var qm = require(config.qmPath);
+//var qm = require('qminer');
 //var qm = require('../../../../cpp/QMiner/index.js');
 var TrafficPrediction = require('./TrafficPrediction.js');
 var path = require('path');
@@ -81,14 +84,15 @@ function cleanCreateLoadMode() {
     trafficPrediction.init(base); //Initiate the traffic prediction workflow
 
     // Import initial data
-    logger.info("Training models...")
     //qm.load.jsonFile(base.store("rawStore"), "./sandbox/data1.json ");
     ////trafficPrediction.importData("./sandbox/measurements_0011_11.txt")
     ////trafficPrediction.importData("./sandbox/measurements_9_sens_3_mon.txt")
     //trafficPrediction.importData("./sandbox/measurements3sensors3months.txt")
     //trafficPrediction.importData("./sandbox/chunk1measurements3sensors3months.txt") // Small chuck of previous (from march on).
     //trafficPrediction.importData("./sandbox/measurements_obvoznica.txt")
-    trafficPrediction.importData("./sandbox/measurements_obvoznica_lite.txt", 2000)
+    //trafficPrediction.importData("./sandbox/measurements_obvoznica_lite.txt", 2000)
+    trafficPrediction.importData("./sandbox/measurements_big.txt")
+    //trafficPrediction.importData("./sandbox/measurements_test.txt")
     //trafficPrediction.importData("./sandbox/data-small.json")
 
     return base;
@@ -122,7 +126,7 @@ function start(mode) {
     //setInterval(function () { trafficPrediction.backup(true) }, 5000);
 
     // create backup before running server
-    //trafficPrediction.backup(true);
+    trafficPrediction.backup(true);
 
     logger.info("\x1b[32m[Model] Service started in '%s' mode\n\x1b[0m", mode);
     
