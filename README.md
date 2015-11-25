@@ -19,14 +19,14 @@ Service is designed as [Node.js](https://nodejs.org/en/) web application, and th
 ### Install 
 This repository contains 3 different services with instructions:
 - [TrafficPrediction]
-    (https://github.com/bkazic/mobis-traffic-prediction-node/blob/master/TrafficPrediction/README.md) - 
-    **TODO:** description
+    (https://github.com/bkazic/mobis-traffic-prediction-node/tree/master/TrafficPrediction) - 
+    main module that accepts measurement records nad performs advanced analytics.
 - [RealTimeImputor]
-    (https://github.com/bkazic/mobis-traffic-prediction-node/blob/master/RealTimeImputor/README.md) - 
-    **TODO:** description
+    (https://github.com/bkazic/mobis-traffic-prediction-node/tree/master/RealTimeImputor) - 
+    fetches real time data from [opendata.si] (http://opendata.si/promet/counters/) and pushes it to TrafficPrediction module.
 - [Imputor]
-    (https://github.com/bkazic/mobis-traffic-prediction-node/blob/master/Imputor/README.md) - 
-    **TODO** description
+    (https://github.com/bkazic/mobis-traffic-prediction-node/tree/master/Imputor) - 
+    pushes saved batch data to TrafficPrediction module.
 
 
 ## Acknowledgments
