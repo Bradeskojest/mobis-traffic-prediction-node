@@ -8,7 +8,7 @@ var server = undefined;
 
 
 // Initialize handlers and server route paths
-function init(base) {
+function init(trafficPrediction) {
     var express = require('express');
     app = express();
 
@@ -20,8 +20,8 @@ function init(base) {
 
     // init handlers
     var handlers = {
-        service: new ServiceHandler(base, app),
-        trafficPrediction: new TrafficPredictionHandler(base)
+        service: new ServiceHandler(trafficPrediction, app),
+        trafficPrediction: new TrafficPredictionHandler(trafficPrediction)
     };
     
     // init routes

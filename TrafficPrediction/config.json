@@ -18,7 +18,8 @@
          "console":{
             "level":"debug"
          }
-      }
+      },
+      "qmPath":"C:/cpp/qminer/index.js"
    },
    "production":{
       "trafficPredictionService":{
@@ -32,7 +33,8 @@
          "console":{
             "level":"info"
          }
-      }
+      },
+      "qmPath":"qminer"
    },
    "test":{
       "trafficPredictionService":{

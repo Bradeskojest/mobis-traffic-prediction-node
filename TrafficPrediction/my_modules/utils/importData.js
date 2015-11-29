@@ -75,8 +75,11 @@
             trafficStore = rec.$store.base.store("trafficStore_" + id);
             
             //console.log("Getting rec with id: " + id + ", Timestamp: " + rec.DateTime.toISOString());
-            //console.log("Saving it to store: " + trafficStore.name);
-            trafficStore.push(rec.toJSON(true));
+            if (trafficStore !== null) {
+                trafficStore.push(rec.toJSON(true));
+            } else {
+                console.log("Store with id %s was not found.", id);
+            }
         } else {
             targetStores[lowestRecIdx].push(rec.toJSON(true));
         }
