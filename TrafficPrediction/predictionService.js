@@ -3,15 +3,12 @@ var config = require('./config.json')[env];
 var qm = require(config.qmPath);
 //var qm = require('qminer');
 //var qm = require('../../../../cpp/QMiner/index.js');
-var TrafficPrediction = require('./TrafficPrediction.js');
 var path = require('path');
 var logger = require("./my_modules/utils/logger/logger.js");
 Utils.Helper = require('./my_modules/utils/helper.js')
 
-var trafficPrediction = new TrafficPrediction();
-
 // create Base in CLEAN CREATE mode
-function cleanCreateMode() {
+function cleanCreateMode(trafficPrediction) {
     // Initialise base in clean create mode   
     var base = new qm.Base({
         mode: 'createClean', 
@@ -24,12 +21,10 @@ function cleanCreateMode() {
     trafficPrediction.init(base); //Initiate the traffic prediction workflow
     
     //TODO: we should probably clear backup here as well?
-    
-    return base;
 }
 
 // create Base in OPEN mode
-function openMode() {
+function openMode(trafficPrediction) {
     var base = new qm.Base({
         mode: 'open',
         dbPath: trafficPrediction.pathDb
@@ -41,12 +36,10 @@ function openMode() {
     
     // load saved models
     trafficPrediction.loadState();
-
-    return base;
 }
 
 // create Base in READ ONLY mode
-function readOnlyMode() {
+function readOnlyMode(trafficPrediction) {
     var base = new qm.Base({
         mode: 'openReadOnly',
         dbpath: trafficPrediction.pathDb
@@ -58,20 +51,18 @@ function readOnlyMode() {
     
     // load saved models
     trafficPredcition.loadState(); 
-    
-    return base;
 }
 
-function restoreFromBackup() {
+function restoreFromBackup(trafficPrediction) {
     // copy db from backup to db
     Utils.Helper.copyFolder(trafficPrediction.pathBackup, trafficPrediction.pathDb);
 
     // call openMode()
-    return openMode();
+    openMode(trafficPrediction);
 }
 
 // create Base in CLEAN CREATE mode and load init data
-function cleanCreateLoadMode() {
+function cleanCreateLoadMode(trafficPrediction) {
     // Initialise base in clean create mode   
     var base = new qm.Base({
         mode: 'createClean', 
@@ -94,12 +85,10 @@ function cleanCreateLoadMode() {
     //trafficPrediction.importData("./sandbox/measurements_big.txt")
     //trafficPrediction.importData("./sandbox/measurements_test.txt")
     //trafficPrediction.importData("./sandbox/data-small.json")
-
-    return base;
 }
 
 // function that handles in which mode store should be opened
-function start(mode) {
+function start(trafficPrediction, mode) {
     var modes = {
         'cleanCreate': cleanCreateMode,
         'cleanCreateLoad': cleanCreateLoadMode,
@@ -119,18 +108,16 @@ function start(mode) {
     }
     
     // run appropriate function
-    var base = modes[mode]();
+    modes[mode](trafficPrediction);
     
     //// schedule backuping and partialFlush-ing
-    //setInterval(function () { base.partialFlush() }, 10*60*1000);
-    //setInterval(function () { trafficPrediction.backup(true) }, 33*60*1000);
+    //setInterval(function () { base.partialFlush() }, 5000);
+    //setInterval(function () { trafficPrediction.backup(true) }, 60 * 1000);
 
     // create backup before running server
     //trafficPrediction.backup(true);
 
     logger.info("\x1b[32m[Model] Service started in '%s' mode\n\x1b[0m", mode);
-    
-    return trafficPrediction.base; 
 }
 
 exports.start = start;
