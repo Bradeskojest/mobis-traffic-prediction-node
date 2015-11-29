@@ -81,8 +81,8 @@ function cleanCreateLoadMode(trafficPrediction) {
     //trafficPrediction.importData("./sandbox/measurements3sensors3months.txt")
     //trafficPrediction.importData("./sandbox/chunk1measurements3sensors3months.txt") // Small chuck of previous (from march on).
     //trafficPrediction.importData("./sandbox/measurements_obvoznica.txt")
-    //trafficPrediction.importData("./sandbox/measurements_obvoznica_lite.txt", 2000)
-    trafficPrediction.importData("./sandbox/measurements_big.txt")
+    trafficPrediction.importData("./sandbox/measurements_obvoznica_lite.txt", 2000)
+    //trafficPrediction.importData("./sandbox/measurements_big.txt")
     //trafficPrediction.importData("./sandbox/measurements_test.txt")
     //trafficPrediction.importData("./sandbox/data-small.json")
 }
@@ -103,20 +103,11 @@ function start(trafficPrediction, mode) {
         for (option in modes) { 
             modeOptions.push(option);    
         }
-
         throw new Error("Base mode '" + mode + "' does not exist! Use one of this: " + modeOptions.toString())
     }
     
     // run appropriate function
     modes[mode](trafficPrediction);
-    
-    //// schedule backuping and partialFlush-ing
-    //setInterval(function () { base.partialFlush() }, 5000);
-    //setInterval(function () { trafficPrediction.backup(true) }, 60 * 1000);
-
-    // create backup before running server
-    trafficPrediction.backup(true);
-
     logger.info("\x1b[32m[Model] Service started in '%s' mode\n\x1b[0m", mode);
 }
 

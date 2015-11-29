@@ -6101,3 +6101,7 @@ $RECYCLE.BIN/
 /TrafficPrediction/test/buffer/test
 /TrafficPrediction/test/metrics/binary
 /TrafficPrediction/test/metrics/me
+/TrafficPrediction/backup.zip
+/TrafficPrediction/backup_old.zip
+/TrafficPrediction/db.zip
+/TrafficPrediction/db_old.zip

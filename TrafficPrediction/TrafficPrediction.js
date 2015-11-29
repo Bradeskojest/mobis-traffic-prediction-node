@@ -278,14 +278,16 @@ TrafficPrediction.prototype.backup = function (reopen) {
         // reopen saved base
         var base = new qm.Base({
             mode: 'open',
-            //dbPath: this.pathDb
-            dbPath: this.pathBackup // backup is not saved properly
+            dbPath: this.pathDb
+            //dbPath: this.pathBackup // backup is not saved properly
         })
         base["mode"] = 'open';
         
         // load saved state
         this.init(base);
-        this.loadState(this.pathBackup); // this should load from pathBackup
+        this.loadState(this.pathDb);
+        //this.loadState(this.pathBackup); // this should load from pathBackup
+        console.log();
         logger.info("Model reopened.");
     }
 }
