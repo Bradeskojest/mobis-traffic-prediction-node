@@ -184,7 +184,6 @@ TrafficPrediction.prototype.initAggregates = function () {
             },
             saveJson: function () { return {} }
         })
-        debugger
         
         //////// ANALYTICS ////////
         logger.info("[Stream Aggregate] adding Analytics");

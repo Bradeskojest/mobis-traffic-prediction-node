@@ -85,6 +85,13 @@ function cleanCreateLoadMode(trafficPrediction) {
     //trafficPrediction.importData("./sandbox/measurements_big.txt")
     //trafficPrediction.importData("./sandbox/measurements_test.txt")
     //trafficPrediction.importData("./sandbox/data-small.json")
+    
+    //// read all files in "./sandbox/new folder and load it one by one
+    //var files = qm.fs.listFile("./sandbox/new", null, true);
+    //files.forEach(function (file) {
+    //    var storeNm = "trafficStore_" + file.substring(27, 34);
+    //    base.store(storeNm).loadJson(file, 100);
+    //})
 }
 
 // function that handles in which mode store should be opened
