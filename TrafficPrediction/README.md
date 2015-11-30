@@ -1,5 +1,7 @@
 ﻿# TrafficPrediction
 
+Main module that accepts raw traffic measurement and performs advanced analytics.
+
 ### Installation
 
 ```
