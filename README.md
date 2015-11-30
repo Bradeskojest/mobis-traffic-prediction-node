@@ -2,7 +2,7 @@
 
 
 
-MobiS traffic prediction service is open-source data analytics application for processing real-time traffic streams and compyting short-term traffic forecasts in an online fashion. Services provides different traffic parameters (*speed, flow, occupancy, traffic-status*), for various forecasting horizons (from *1h*, to *24h* into the future) .
+MobiS traffic prediction service is open-source data analytics application for processing real-time traffic streams providing online short-term traffic forecasts. Services provides forecasts for different traffic parameters (*speed, flow, occupancy, traffic-status*), for various forecasting horizons (from *1h*, to *24h*) into the future.
 
 Service provides:
 - [REST APIs](http://mustang.ijs.si:9567/routes) - used for pusing raw data (loop counters or bluetooth sensors) and retrieving processed data 
