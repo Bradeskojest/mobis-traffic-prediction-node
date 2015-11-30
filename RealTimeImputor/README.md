@@ -12,10 +12,6 @@ npm install
 
 Starting the service (by default the service is run in `cleanCreate` mode).
 ```
-npm start
-```
-or
-```
 node index.js
 ```
 ---
@@ -26,6 +22,6 @@ By default, service is started in `development` mode on localhost. If we want to
 
 Example:
 ```
-set NODE_ENV=production&& npm start
+set NODE_ENV=production&& node index.js
 ```
 Root, port and other configurations should be specified in [config.json](https://github.com/bkazic/mobis-traffic-prediction-node/blob/master/TrafficPrediction/config.json) file.
