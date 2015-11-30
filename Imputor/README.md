@@ -2,7 +2,7 @@
 
 This module is mainly used for development purposes. Module pushes historical batch data to [TrafficPrediction module](https://github.com/bkazic/mobis-traffic-prediction-node/tree/master/TrafficPrediction).
 
-Historical data are not included into this repository. Please contact the author if you are interested in historical traffic data.
+**Disclamer:** Historical data are not included into this public repository due to privacy issues. Please contact the author if you are interested in using this data for research purposes.
 
 ### Installation
 
