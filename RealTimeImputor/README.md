@@ -1,6 +1,6 @@
 ﻿# RealTimeImputor
  
- Service retrieves real time loop counter data from opendata.si and pushes it to TrafficPrediction module.
+ Service retrieves real time loop counter data from opendata.si and pushes it to [TrafficPrediction module](https://github.com/bkazic/mobis-traffic-prediction-node/tree/master/TrafficPrediction).
 
 ### Installation
 
