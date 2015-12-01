@@ -51,3 +51,20 @@ exports.copyFolder = function (inFolder, outFolder) {
     });
     logger.debug(files.length + " files copied.");
 }
+
+exports.newInterval = function () {
+    var Interval = function () {
+        this.lastTime = undefined;
+        
+        this.setInterval = function (rec, interval, callback) {
+            if (!this.lastTime) this.lastTime = rec.DateTime
+            
+            if (rec.DateTime.getTime() - this.lastTime.getTime() >= interval) {
+                this.lastTime = rec.DateTime;
+                console.log("Rec: " + rec.DateTime.toString())
+                callback();
+            }
+        }
+    }
+    return new Interval();
+};
