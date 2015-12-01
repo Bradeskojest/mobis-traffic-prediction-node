@@ -1,7 +1,7 @@
 ﻿var logger = require("../../my_modules/utils/logger/logger.js");
 
 // Constructor
-function ServiceHandler(base, app) {
+function ServiceHandler(trafficPrediction, app) {
     this.getBase = function () { return trafficPrediction.base; };
     this.app = app;
 }
