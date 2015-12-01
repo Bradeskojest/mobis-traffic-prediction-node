@@ -48,9 +48,9 @@ TrafficPrediction.prototype.initStores = function (base) {
     this.sensorIds = counterNodes.map(function (sensor) { return sensor.Name.replace("-", "_") })
     
     // shutdown properly when service is closed
-    process.on('SIGINT', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
-    process.on('SIGHUP', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
-    process.on('uncaughtException', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
+    //process.on('SIGINT', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
+    //process.on('SIGHUP', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
+    //process.on('uncaughtException', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
 }
 
 TrafficPrediction.prototype.initModels = function () {
@@ -101,14 +101,15 @@ TrafficPrediction.prototype.initModels = function () {
             predictionFields: [ //TODO: Not sure, if I want to use names of fields or fields??
                 { field: resampledStore.field("NumOfCars") },
                 { field: resampledStore.field("Occupancy") },
-                { field: resampledStore.field("Speed") },
+                { field: resampledStore.field("TrafficStatus") },
+                { field: resampledStore.field("Speed") }
             ],
             
-            target: resampledStore.field("NumOfCars"),
+            target: resampledStore.field("NumOfCars"), //this is probably not used in multi fields predictions
             
             otherParams: {
                 // This are optional parameters
-                evaluationOffset: 10, // It was 50 before
+                evaluationOffset: 50, // It was 50 before
             },
             
             predictionHorizons: [1, 3, 6, 9, 12, 15, 18],

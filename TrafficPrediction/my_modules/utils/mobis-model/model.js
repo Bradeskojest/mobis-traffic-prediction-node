@@ -124,6 +124,10 @@ Model.prototype.predict = function (rec) {
             this.avrVal.setVal(locAvrg.getVal({ "DateTime": predTime }));
             try {
                 predictionRec[predictionFieldName] = linreg.predict(this.featureSpace.extractVector(rec));
+                // this is a temporary hack - instead of dealing with classification problem
+                if (predictionFieldName === "TrafficStatus") { 
+                    predictionRec[predictionFieldName] = Math.round(predictionRec[predictionFieldName]);
+                }
             } catch (err) {
                 throw new Error("Could not make prediction. " + err);
                 logger.error(err.stack);
