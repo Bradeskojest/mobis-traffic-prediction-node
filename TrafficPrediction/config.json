@@ -19,7 +19,7 @@
             "level":"debug"
          }
       },
-      "qmPath":"C:/cpp/qminer/index.js"
+      "qmPath":"C:/Users/bkazic/Documents/cpp/QMiner/index.js"
    },
    "production":{
       "trafficPredictionService":{
