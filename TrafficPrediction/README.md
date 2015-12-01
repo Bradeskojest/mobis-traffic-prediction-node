@@ -7,6 +7,9 @@ Main module that accepts raw traffic measurement and performs advanced analytics
 ```
 npm install TrafficPrediction
 ```
+- download db.zip from the [latest release](https://github.com/bkazic/mobis-traffic-prediction-node/releases) 
+- unzip it to [./TrafficPrediction](https://github.com/bkazic/mobis-traffic-prediction-node/tree/master/TrafficPrediction) folder.
+- edit [config.json](https://github.com/bkazic/mobis-traffic-prediction-node/blob/master/TrafficPrediction/config.json) if needed (to change root, port, admins, ...)
 
 ### Starting the service
 
