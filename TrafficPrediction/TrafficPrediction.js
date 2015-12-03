@@ -207,9 +207,10 @@ TrafficPrediction.prototype.initAggregates = function () {
                     //mobisModel.predict(rec);
                     mobisModel.update(rec);
                     mobisModel.evaluate(rec);
-                    mobisModel.consoleReport(rec);
-                    
                 }
+
+                // report to console only if we are in development env
+                if (env === 'development') mobisModel.consoleReport(rec);
 
             }.bind(this),
             saveJson: function () { return {} }
