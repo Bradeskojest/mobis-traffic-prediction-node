@@ -199,7 +199,8 @@ function selectContent(sensor, horizon) {
 					"Speed: " + sensor.Speed + "<br>" +
 					"Number of cars: " + sensor.NumOfCars + "<br>" +
 					"Gap: " + sensor.Gap + "<br>" +
-					"Occupancy: " + sensor.Occupancy + "<br>";
+					"Occupancy: " + sensor.Occupancy + "<br>" +
+                    "Traffic Status: " + sensor.TrafficStatus + "<br>";
         return content;
     }
     else if (horizon == 1) {
@@ -213,41 +214,57 @@ function selectContent(sensor, horizon) {
 				"Speed: " + Math.round(sensor.Predictions[ind].Speed * 10) / 10 + "<br>" +
 				"Number of cars: " + Math.round(sensor.Predictions[ind].NumOfCars * 10) / 10 + "<br>" +
 				"Occupancy: " + Math.round(sensor.Predictions[ind].Occupancy * 10) / 10 + "<br>" +
+                "Traffic Status: " + sensor.TrafficStatus + "<br>" +
 				"Update count: " + sensor.Predictions[ind].UpdateCount + "<br>";
     return content;
 				
 }
 
 function setMarkerColor(sensor, horizon) {
-    var max = sensor.measuredBy.MaxSpeed;
-    var speed;
-    if (horizon == 0) {
-        speed = sensor.Speed;
-    }
-    else if (horizon == 1) {
-        speed = sensor.Predictions[0].Speed;
-    }
-    else {
-        speed = sensor.Predictions[horizon - 2 / 3 * horizon].Speed;
-    }
-    if (speed == 0) {
-        return "error";
-    }
-    var deviance = 1 - speed / max;
-    if (deviance <= green) {
-        return "green";
-    }
-    else if (green < deviance && deviance <= yellow) {
-        return "yellow";
-    }
-    else if (yellow < deviance && deviance <= orange) {
-        return "orange";
-    }
-	// if (0.1 < deviance)
-    else {
-        return "red";
+    switch (sensor.TrafficStatus) {
+        case 6:
+            return "error"; break;
+        case 1:
+            return "green"; break;
+        case 2:
+            return "yellow"; break;
+        case 3:
+            return "orange"; break;
+        case 4:
+            return "red"; break;
     }
 }
+
+//function setMarkerColor(sensor, horizon) {
+//    var max = sensor.measuredBy.MaxSpeed;
+//    var speed;
+//    if (horizon == 0) {
+//        speed = sensor.Speed;
+//    }
+//    else if (horizon == 1) {
+//        speed = sensor.Predictions[0].Speed;
+//    }
+//    else {
+//        speed = sensor.Predictions[horizon - 2 / 3 * horizon].Speed;
+//    }
+//    if (speed == 0) {
+//        return "error";
+//    }
+//    var deviance = 1 - speed / max;
+//    if (deviance <= green) {
+//        return "green";
+//    }
+//    else if (green < deviance && deviance <= yellow) {
+//        return "yellow";
+//    }
+//    else if (yellow < deviance && deviance <= orange) {
+//        return "orange";
+//    }
+//	// if (0.1 < deviance)
+//    else {
+//        return "red";
+//    }
+//}
 
 /**
  * Returns a random number between min (inclusive) and max (exclusive)
