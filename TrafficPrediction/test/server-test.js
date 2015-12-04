@@ -56,13 +56,12 @@ describe('Server test', function () {
         server.close(done);
     })
     
-    // TODO: not working
-    ////// localhost:3333/
-    //it('#GET ' + url + "/", function (done) {
-    //    request(url)
-    //        .get("/")
-    //        .expect(200, done)
-    //});
+    //// localhost:3333/
+    it('#GET ' + url + "/", function () {
+        request(url)
+            .get("/")
+            .expect(200)
+    });
     
     //// localhost:3333/store
     it('#GET ' + url + "/routes", function (done) {
@@ -165,6 +164,39 @@ describe('Server test', function () {
             .expect(200, done)
     });
     
+    // localhost:3333/traffic-predictions/0011_11
+    it('#GET ' + url + "/traffic-predictions/0011_11", function (done) {
+        request(url)
+            .get("/traffic-predictions/0011_11")
+            .set('Accept', 'application/json')
+            .expect(200, done)
+    });
+    
+    // localhost:3333/traffic-predictions/0011_11?size=2
+    it('#GET ' + url + "/traffic-predictions/0011_11?size=2", function (done) {
+        request(url)
+            .get("/traffic-predictions/0011_11?size=2")
+            .set('Accept', 'application/json')
+            .expect(200, done)
+    });
+
+    // localhost:3333/traffic-predictions/9999_99
+    it('#GET ' + url + "/traffic-predictions/9999_99", function (done) {
+        request(url)
+            .get("/traffic-predictions/0211_12?size=5")
+            .set('Accept', 'application/json')
+            .expect(400, done)
+    });
+    
+    // localhost:3333/traffic-predictions
+    it('#GET ' + url + "/traffic-predictions/9999_99?size=test", function (done) {
+        request(url)
+            .get("/traffic-predictions/0211_12?size=5")
+            .set('Accept', 'application/json')
+            .expect(400, done)
+    });
+    
+            
     //// localhost:3333/traffic-predictions/add
     it('#POST ' + url + "/traffic-predictions/add", function (done) {
         request(url)
