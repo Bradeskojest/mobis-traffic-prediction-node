@@ -6,8 +6,6 @@
 var env = process.env.NODE_ENV || 'development';
 var config = require('./config.json')[env];
 var qm = require(config.qmPath);
-//var qm = require('qminer');
-//var qm = require('../../../../cpp/QMiner/index.js');
 var path = require('path');
 var evaluation = qm.analytics.metrics;
 var logger = require("./my_modules/utils/logger/logger.js");
@@ -101,14 +99,15 @@ TrafficPrediction.prototype.initModels = function () {
             predictionFields: [ //TODO: Not sure, if I want to use names of fields or fields??
                 { field: resampledStore.field("NumOfCars") },
                 { field: resampledStore.field("Occupancy") },
-                { field: resampledStore.field("Speed") },
+                { field: resampledStore.field("TrafficStatus") },
+                { field: resampledStore.field("Speed") }
             ],
             
-            target: resampledStore.field("NumOfCars"),
+            target: resampledStore.field("NumOfCars"), //this is probably not used in multi fields predictions
             
             otherParams: {
                 // This are optional parameters
-                evaluationOffset: 10, // It was 50 before
+                evaluationOffset: 50, // It was 50 before
             },
             
             predictionHorizons: [1, 3, 6, 9, 12, 15, 18],
@@ -184,7 +183,6 @@ TrafficPrediction.prototype.initAggregates = function () {
             },
             saveJson: function () { return {} }
         })
-        debugger
         
         //////// ANALYTICS ////////
         logger.info("[Stream Aggregate] adding Analytics");
@@ -207,9 +205,10 @@ TrafficPrediction.prototype.initAggregates = function () {
                     //mobisModel.predict(rec);
                     mobisModel.update(rec);
                     mobisModel.evaluate(rec);
-                    mobisModel.consoleReport(rec);
-                    
                 }
+
+                // report to console only if we are in development env
+                if (env === 'development') mobisModel.consoleReport(rec);
 
             }.bind(this),
             saveJson: function () { return {} }
@@ -243,12 +242,6 @@ TrafficPrediction.prototype.loadState = function (path) {
 }
 
 TrafficPrediction.prototype.shutdown = function () {
-    // debugging purpuses - delete it later
-    //logger.debug(JSON.stringify(this.mobisModels['0178_12'].recordBuffers, false, 2))
-    //logger.debug(JSON.stringify(this.mobisModels['0178_12'].errorModels, false, 2))
-    //logger.debug(JSON.stringify(this.mobisModels['0178_12'].locAvrgs, false, 2))
-    //logger.debug(JSON.stringify(this.mobisModels['0178_12'].linregs, false, 2))
-    
     if (!this.base.isClosed()) {
         logger.info("Shutting down...");
         this.saveState();

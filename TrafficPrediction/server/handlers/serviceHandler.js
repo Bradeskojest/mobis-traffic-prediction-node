@@ -1,7 +1,7 @@
 ﻿var logger = require("../../my_modules/utils/logger/logger.js");
 
 // Constructor
-function ServiceHandler(base, app) {
+function ServiceHandler(trafficPrediction, app) {
     this.getBase = function () { return trafficPrediction.base; };
     this.app = app;
 }
@@ -58,7 +58,7 @@ ServiceHandler.prototype.handleGetStoreList = function (req, res) {
 ServiceHandler.prototype.handleGetStoreRecs = function (req, res) {
     var storeName = req.params.store; // TODO: try cath
     var limit = (typeof req.query.limit === 'undefined') ? 10 : parseInt(req.query.limit);
-    var recs = [];
+    if (isNaN(limit)) res.status(400).json({ error: "Parameter '" + req.query.limit + "' is not valid" })    
     
     try {
         var thisStore = this.getBase().store(storeName);

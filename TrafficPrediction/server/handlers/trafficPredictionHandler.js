@@ -14,14 +14,7 @@ TrafficPredictionHandler.prototype.handleGetStoreList = function (req, res) {
         res.status(200).json(storeList);
     }
     catch (err) {
-        if (typeof err.message != 'undefined' && err.message == "[addon] Exception: Base is closed!") {
-            res.status(500).json({ error: "Base is closed!" });
-            logger.warn("Cannot execute. Base is closed!");
-        }
-        else {
-            res.status(500).json({ error: "Internal Server Error" });
-            logger.error(err.stack); 
-        }
+        handleBaseClosedError(err, req, res);
     }
 }
 
@@ -32,14 +25,7 @@ TrafficPredictionHandler.prototype.handleGetSensors = function (req, res) {
         res.status(200).json(this.getBase().store("CounterNode").allRecords.toJSON().records);
     }
     catch (err) {
-        if (typeof err.message != 'undefined' && err.message == "[addon] Exception: Base is closed!") {
-            res.status(500).json({ error: "Base is closed!" });
-            logger.warn("Cannot execute. Base is closed!");
-        }
-        else {
-            res.status(500).json({ error: "Internal Server Error" });
-            logger.error(err.stack); 
-        }
+        handleBaseClosedError(err, req, res);
     }
 }
 
@@ -60,14 +46,7 @@ TrafficPredictionHandler.prototype.handleGetTrafficPredictions = function (req, 
         res.status(200).json(recs);
     }
     catch (err) {
-        if (typeof err.message != 'undefined' && err.message == "[addon] Exception: Base is closed!") {
-            res.status(500).json({ error: "Base is closed!" });
-            logger.warn("Cannot execute. Base is closed!");
-        }
-        else {
-            res.status(500).json({ error: "Internal Server Error" });
-            logger.error(err.stack);
-        }
+        handleBaseClosedError(err, req, res);
     }
 }
 
@@ -78,24 +57,45 @@ TrafficPredictionHandler.prototype.handleGetTrafficPredictionsById = function (r
     id = id.replace("-", "_");
 
     try {
-        var store = this.getBase().store("resampledStore_" + id);
-        
-        // Return from function if store with particular sensor id was not found
-        if (store.last == null) {
-            res.status(400).send('Prediction for this sensor ID does not exists');
+        var thisStore = this.getBase().store("resampledStore_" + id);
+        // check if store exists
+        if (thisStore == null) {
+            logger.warn("Store with id %s was not found.", id);
+            res.status(400).json({ error: 'Store with id ' + id + ' was not found.' } );
             return;
         }
-        res.json(store.last.toJSON(true, true));
+        
+        // check if store has any records
+        if (thisStore.last == null) {
+            logger.warn('No records were found for store with id %s', id);
+            res.status(400).json({ error: 'No records were found for store with id ' + id } );
+            return;
+        }
+        
+        // retrun last rec if size is not defined, else create array
+        if (typeof req.query.size === 'undefined') {
+            res.status(200).json(thisStore.last.toJSON(true, true));
+        } 
+        else {
+            var size = parseInt(req.query.size); // TODO: try carch for parsing
+            if (isNaN(size)) res.status(400).json({error: "Parameter '" + req.query.size + "' is not valid"})    
+
+            var offset = thisStore.length - size;
+            offset = (offset > 0) ? offset : 0   // in case offset is negative, set it to 0. Otherwise program crashes.
+            var recs = thisStore.allRecords.trunc(size, offset).reverse().toJSON(true, true);
+
+            // check if any record was found
+            if (recs['$hits'] === 0) {
+                res.status(400).json({ error: "No records found" });
+                logger.warn("No records found"); console.log();
+                return;
+            }
+            
+            res.status(200).json(recs['records'])
+        }
     }
     catch (err) {
-        if (typeof err.message != 'undefined' && err.message == "[addon] Exception: Base is closed!") {
-            res.status(500).json({ error: "Base is closed!" });
-            logger.warn("Cannot execute. Base is closed!");
-        }
-        else {
-            res.status(500).json({ error: "Internal Server Error" });
-            logger.error(err.stack);
-        }
+        handleBaseClosedError(err, req, res);
     }
 }
 
@@ -162,6 +162,17 @@ TrafficPredictionHandler.prototype.handleAddMeasurement = function (req, res) {
     logger.debug("Record stored into store %s. Store length: %s ", trafficStore.name, trafficStore.length);
     logger.info("New record was stored into store %s. Record: %s", trafficStore.name, JSON.stringify(req.body));
     res.status(200).json({message: "OK"}).end();
+}
+
+var handleBaseClosedError = function (err, req, res) {
+    if (typeof err.message != 'undefined' && err.message == "[addon] Exception: Base is closed!") {
+        res.status(500).json({ error: "Base is closed!" });
+        logger.warn("Cannot execute. Base is closed!");
+    }
+    else {
+        res.status(500).json({ error: "Internal Server Error" });
+        logger.error(err.stack);
+    }
 }
 
 module.exports = TrafficPredictionHandler;

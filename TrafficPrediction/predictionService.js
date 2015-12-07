@@ -1,8 +1,6 @@
 ﻿var env = process.env.NODE_ENV || 'development';
 var config = require('./config.json')[env];
 var qm = require(config.qmPath);
-//var qm = require('qminer');
-//var qm = require('../../../../cpp/QMiner/index.js');
 var path = require('path');
 var logger = require("./my_modules/utils/logger/logger.js");
 Utils.Helper = require('./my_modules/utils/helper.js')
@@ -85,6 +83,13 @@ function cleanCreateLoadMode(trafficPrediction) {
     //trafficPrediction.importData("./sandbox/measurements_big.txt")
     //trafficPrediction.importData("./sandbox/measurements_test.txt")
     //trafficPrediction.importData("./sandbox/data-small.json")
+    
+    //// read all files in "./sandbox/new folder and load it one by one
+    //var files = qm.fs.listFile("./sandbox/new", null, true);
+    //files.forEach(function (file) {
+    //    var storeNm = "trafficStore_" + file.substring(27, 34);
+    //    base.store(storeNm).loadJson(file, 100);
+    //})
 }
 
 // function that handles in which mode store should be opened

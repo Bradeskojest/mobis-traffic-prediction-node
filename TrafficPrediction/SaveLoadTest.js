@@ -8,8 +8,6 @@
 var env = process.env.NODE_ENV || 'development';
 var config = require('./config.json')[env];
 var qm = require(config.qmPath);
-//var qm = require('qminer');
-//var qm = require('../../../../cpp/QMiner/index.js');
 var path = require('path');
 var server = require('./server/server.js');
 var evaluation = qm.analytics.metrics;
