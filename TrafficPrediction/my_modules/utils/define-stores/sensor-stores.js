@@ -1,4 +1,6 @@
-﻿var qm = require('qminer');
+﻿var env = process.env.NODE_ENV || 'development';
+var config = require('../../../config.json')[env];
+var qm = require('qminer');
 var path = require('path');
 
 createLoadStore = function (base) {
@@ -67,8 +69,9 @@ createNodeStore = function (base) {
     }
     
     // load records
-    qm.load.jsonFile(base.store('CounterNode'), path.join(__dirname , '../../../sandbox/countersNodes.txt'));
+    //qm.load.jsonFile(base.store('CounterNode'), path.join(__dirname , '../../../sandbox/countersNodes.txt'));
     //qm.load.jsonFile(base.store('CounterNode'), path.join(__dirname , '../../../sandbox/countersNodes_big.txt'));
+    qm.load.jsonFile(base.store('CounterNode'), path.join(__dirname ,  '../../../sandbox', config.countersNodes));
 
     // Load short version (only 5 nodes)
     //qm.load.jsonFile(base.store('CounterNode'), path.join(__dirname , './countersNodes.txt'));

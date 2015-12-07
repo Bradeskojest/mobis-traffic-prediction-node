@@ -19,7 +19,8 @@
             "level":"debug"
          }
       },
-      "qmPath":"qminer"
+      "qmPath":"qminer",
+      "countersNodes":"countersNodes.txt"
    },
    "production":{
       "trafficPredictionService":{
@@ -34,7 +35,8 @@
             "level":"info"
          }
       },
-      "qmPath":"qminer"
+      "qmPath":"qminer",
+      "countersNodes":"countersNodes_big.txt"
    },
    "test":{
       "trafficPredictionService":{
@@ -53,6 +55,7 @@
             "level":"error"
          }
       },
-      "qmPath":"qminer"
+      "qmPath":"qminer",
+      "countersNodes":"countersNodes.txt"
    }
 }
