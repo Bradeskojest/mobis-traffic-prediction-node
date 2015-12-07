@@ -5,6 +5,7 @@ var TrafficPrediction = require('./TrafficPrediction.js');
 var predictionService = require('./predictionService.js');
 var server = require('./server/server.js');
 
+
 // create traffic prediction model instance
 var trafficPrediction = new TrafficPrediction();
 
@@ -12,9 +13,18 @@ var trafficPrediction = new TrafficPrediction();
 var mode = (process.argv[2] == null) ? "cleanCreate" : process.argv[2];
 predictionService.start(trafficPrediction, mode);
 
-//// schedule backuping and partialFlush-ing
-//setInterval(function () { trafficPrediction.base.partialFlush() }, 5000);
-//setInterval(function () { trafficPrediction.backup(true) }, 60 * 1000);
+
+// schedule partialFlush-ing (if defined)
+if (config.partialFlushInterval) {
+    var interval = config.partialFlushInterval;
+    setInterval(function () { trafficPrediction.base.partialFlush() }, interval);
+}
+// schedule backup-ing (if defined)
+if (config.backupInterval) {
+    var interval = config.backupInterval;
+    setInterval(function () { trafficPrediction.backup(true) }, interval);
+} 
+
 
 // create backup before running server
 trafficPrediction.backup(true);

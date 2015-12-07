@@ -20,7 +20,9 @@
          }
       },
       "qmPath":"qminer",
-      "countersNodes":"countersNodes.txt"
+      "countersNodes":"countersNodes.txt",
+      "partialFlushInterval":false,
+      "backupInterval":false
    },
    "production":{
       "trafficPredictionService":{
@@ -36,7 +38,9 @@
          }
       },
       "qmPath":"qminer",
-      "countersNodes":"countersNodes_big.txt"
+      "countersNodes":"countersNodes_big.txt",
+      "partialFlushInterval":false,
+      "backupInterval":3600000
    },
    "test":{
       "trafficPredictionService":{
@@ -56,6 +60,8 @@
          }
       },
       "qmPath":"qminer",
-      "countersNodes":"countersNodes.txt"
+      "countersNodes":"countersNodes.txt",
+      "partialFlushInterval":false,
+      "backupInterval":false
    }
 }
