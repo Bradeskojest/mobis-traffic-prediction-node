@@ -1,8 +1,6 @@
 ﻿var env = process.env.NODE_ENV || 'development';
 var config = require('./config.json')[env];
 var qm = require(config.qmPath);
-//var qm = require('qminer');
-//var qm = require('../../../../cpp/QMiner/index.js');
 var path = require('path');
 var logger = require("./my_modules/utils/logger/logger.js");
 Utils.Helper = require('./my_modules/utils/helper.js')

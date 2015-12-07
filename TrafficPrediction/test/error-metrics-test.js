@@ -1,8 +1,6 @@
 ﻿// import the qm module
 var qm = require('qminer');
-//var qm = require('../../../../../../cpp/QMiner/index.js');
 var assert = require('assert');
-//var evaluation = require('../../my_modules/utils/online-evaluation/evaluation.js');
 var evaluation = qm.analytics.metrics
 
 describe('Loading/Saving error metrics', function () {
@@ -25,6 +23,8 @@ describe('Loading/Saving error metrics', function () {
     // save state
     var fout = new qm.fs.FOut(error.metric.shortName.toLowerCase())
     error.save(fout);
+    fout.flush();
+    fout.close();
     
     // create new mean error instance
     var error2 = new evaluation.MeanError();
@@ -38,6 +38,7 @@ describe('Loading/Saving error metrics', function () {
     
     // load option number 2 - via constructor
     var error3 = new evaluation.MeanError(fin);
+    fin.close()
     
     // check if equal
     it('should load identical aggregate state as it was saved', function () {

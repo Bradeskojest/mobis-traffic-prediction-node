@@ -2,8 +2,6 @@
 var env = process.env.NODE_ENV || 'development';
 var config = require('../../../config.json')[env];
 var qm = require(config.qmPath);
-//var qm = require('qminer');
-//var qm = require('../../../../../../../cpp/QMiner/index.js');
 var logger = require("../logger/logger.js");
 var path = require('path');
 

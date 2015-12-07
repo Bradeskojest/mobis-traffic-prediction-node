@@ -17,7 +17,7 @@ predictionService.start(trafficPrediction, mode);
 //setInterval(function () { trafficPrediction.backup(true) }, 60 * 1000);
 
 // create backup before running server
-//trafficPrediction.backup(true);
+trafficPrediction.backup(true);
 
 // START SERVER
 server.init(trafficPrediction);

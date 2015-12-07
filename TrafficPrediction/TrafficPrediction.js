@@ -6,8 +6,6 @@
 var env = process.env.NODE_ENV || 'development';
 var config = require('./config.json')[env];
 var qm = require(config.qmPath);
-//var qm = require('qminer');
-//var qm = require('../../../../cpp/QMiner/index.js');
 var path = require('path');
 var evaluation = qm.analytics.metrics;
 var logger = require("./my_modules/utils/logger/logger.js");
@@ -48,9 +46,9 @@ TrafficPrediction.prototype.initStores = function (base) {
     this.sensorIds = counterNodes.map(function (sensor) { return sensor.Name.replace("-", "_") })
     
     // shutdown properly when service is closed
-    //process.on('SIGINT', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
-    //process.on('SIGHUP', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
-    //process.on('uncaughtException', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
+    process.on('SIGINT', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
+    process.on('SIGHUP', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
+    process.on('uncaughtException', function () { this.shutdown(); this.backup(); process.exit(); }.bind(this));
 }
 
 TrafficPrediction.prototype.initModels = function () {
@@ -244,12 +242,6 @@ TrafficPrediction.prototype.loadState = function (path) {
 }
 
 TrafficPrediction.prototype.shutdown = function () {
-    // debugging purpuses - delete it later
-    //logger.debug(JSON.stringify(this.mobisModels['0178_12'].recordBuffers, false, 2))
-    //logger.debug(JSON.stringify(this.mobisModels['0178_12'].errorModels, false, 2))
-    //logger.debug(JSON.stringify(this.mobisModels['0178_12'].locAvrgs, false, 2))
-    //logger.debug(JSON.stringify(this.mobisModels['0178_12'].linregs, false, 2))
-    
     if (!this.base.isClosed()) {
         logger.info("Shutting down...");
         this.saveState();
