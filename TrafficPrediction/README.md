@@ -1,5 +1,8 @@
 ﻿# TrafficPrediction
 
+[![Build Status](https://travis-ci.org/bkazic/mobis-traffic-prediction-node.svg?branch=master)](https://travis-ci.org/bkazic/mobis-traffic-prediction-node)
+[![Build status](https://ci.appveyor.com/api/projects/status/ikm5l9w9820ddr3g/branch/master?svg=true)](https://ci.appveyor.com/project/bkazic/mobis-traffic-prediction-node/branch/master)
+
 Main module that accepts raw traffic measurement and performs advanced analytics.
 
 ### Installation
