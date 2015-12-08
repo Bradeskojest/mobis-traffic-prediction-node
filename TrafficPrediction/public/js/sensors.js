@@ -147,7 +147,7 @@ function getSensors(horizon) {
         type: 'GET',
         contentType: "application/json",
         dataType: 'json',
-        url: '/traffic-predictions',    
+        url: './traffic-predictions',    
         success: function (result) {
             removeMarkers();
             var strt = new Date().getTime();

@@ -14,7 +14,7 @@
     "production": {
         "trafficPredictionService": {
             "server": {
-				"root": "http://mustang.ijs.si:9569",
+				"root": "http://alpha.ijs.si:9569",
                 "port": 9569
             }
         }, 
