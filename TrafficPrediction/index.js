@@ -27,7 +27,7 @@ if (config.backupInterval) {
 
 
 // create backup before running server
-trafficPrediction.backup(true);
+//trafficPrediction.backup(true);
 
 // START SERVER
 server.init(trafficPrediction);
