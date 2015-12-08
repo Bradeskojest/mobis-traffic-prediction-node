@@ -11,6 +11,7 @@ LocalizedAverage = require('../baseline-models/localized-average.js')
 var analytics = qm.analytics;
 var specialDates = new SpecialDates.newSpecialDates('Slovenian_holidays');
 var CalendarFtrs = SpecialDates.newCalendarFeatures();
+var discretizeTrafficStatus = require('../helper.js').discretizeTrafficStatus;
 
 var modelBuffers = require('./submodels/model-buffers.js');
 var modelErrors = require('./submodels/model-errors.js');
@@ -123,8 +124,9 @@ Model.prototype.predict = function (rec) {
             try {
                 predictionRec[predictionFieldName] = linreg.predict(this.featureSpace.extractVector(rec));
                 // this is a temporary hack - instead of dealing with classification problem
-                if (predictionFieldName === "TrafficStatus") { 
-                    predictionRec[predictionFieldName] = Math.round(predictionRec[predictionFieldName]);
+                if (predictionFieldName === "TrafficStatus") {
+                    //predictionRec[predictionFieldName] = Math.round(predictionRec[predictionFieldName]);
+                    predictionRec[predictionFieldName] = discretizeTrafficStatus(predictionRec[predictionFieldName]);
                 }
             } catch (err) {
                 throw new Error("Could not make prediction. " + err);

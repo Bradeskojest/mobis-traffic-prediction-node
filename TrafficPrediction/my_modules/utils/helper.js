@@ -68,3 +68,11 @@ exports.newInterval = function () {
     }
     return new Interval();
 };
+
+exports.discretizeTrafficStatus = function (val) {
+    if (val < 1.5) { return 1 }
+    else if (val < 2.5) { return 2 }
+    else if (val < 3.5) { return 3 }
+    else if (val < 4.5) { return 4 }
+    else { return 5 }
+}
