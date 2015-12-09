@@ -30,11 +30,80 @@ TrafficPredictionHandler.prototype.handleGetSensors = function (req, res) {
 }
 
 
-// Returns traffic prediction from all sensors
+// Returns traffic prediction from all sensors - old version
+//TrafficPredictionHandler.prototype.handleGetTrafficPredictions = function (req, res) {
+//    var recs = [];
+//    var base = this.getBase();
+//    try {
+//        base.getStoreList().forEach(function (storeNm) {
+//            if (storeNm.storeName.indexOf("resampledStore") != -1) {
+//                var store = base.store(storeNm.storeName);
+//                if (store.last != null) {
+//                    recs.push(store.last.toJSON(true, true))
+//                }
+//            }
+//        });
+//        res.status(200).json(recs);
+//    }
+//    catch (err) {
+//        handleBaseClosedError(err, req, res);
+//    }
+//}
+
+// Returns traffic prediction from all sensors (with multiple optional queries, such as time, horizon, id)
 TrafficPredictionHandler.prototype.handleGetTrafficPredictions = function (req, res) {
     var recs = [];
     var base = this.getBase();
+    
+    // Helper function to find prediction by time: Example: prediction?id=0011_11&time=16h34
+    var findRecByTime = function (arr, time) {
+        time = time.replace("h", ":"); //Example: 16h00
+        
+        // convert minutes to full hours. Example 16:43 --> 17:00	
+        var tm = time.split(":");
+        tm = tm.map(function (str) { return Number(str) });
+        var hour = (tm[1] > 30) ? (tm[0] + 1) % 24 : tm[0];
+        time = ("0" + hour).slice(-2) + ":00";
+        
+        var result = arr.filter(function (predictionRec) {
+            var predTmStr = predictionRec.PredictionTime;
+            var tIdx = predTmStr.indexOf("T");
+            var predTm = predTmStr.slice(tIdx + 1, tIdx + 6);
+            
+            return (predTm == time);
+        })
+        
+        return result;
+    }
+    
     try {
+        // If time is specified
+        if (req.query.id == null && req.query.horizon == null && req.query.time != null) {
+            var time = req.query.time.toString();
+            
+            base.getStoreList().forEach(function (storeNm) {
+                if (storeNm.storeName.indexOf("resampledStore") != -1) {
+                    var store = base.store(storeNm.storeName);
+                    if (store.last != null) {
+                        var rec = store.last.toJSON(true, true);
+                        // find predictions for specific time
+                        var pred = findRecByTime(rec.Predictions, time);
+                        
+                        // Respond with error if no prediction was found
+                        //if (pred[0] == undefined) {
+                        //    res.status(400).json({error: "Prediction for this time does not exist."});
+                        //}
+                        
+                        rec.Predictions = pred;
+                        recs.push(rec)
+                    }
+                }
+            });
+            res.status(200).json(recs);
+        }
+        
+        
+        // If id, horizon and time are not specified
         base.getStoreList().forEach(function (storeNm) {
             if (storeNm.storeName.indexOf("resampledStore") != -1) {
                 var store = base.store(storeNm.storeName);
@@ -44,6 +113,7 @@ TrafficPredictionHandler.prototype.handleGetTrafficPredictions = function (req, 
             }
         });
         res.status(200).json(recs);
+
     }
     catch (err) {
         handleBaseClosedError(err, req, res);
