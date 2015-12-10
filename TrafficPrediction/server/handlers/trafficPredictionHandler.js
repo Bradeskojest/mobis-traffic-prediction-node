@@ -1,9 +1,11 @@
 ﻿var logger = require("../../my_modules/utils/logger/logger.js");
+var helper = require("../../my_modules/utils/helper.js");
 
 
 // Constructor
 var TrafficPredictionHandler = function (trafficPrediction) {
     this.getBase = function () { return trafficPrediction.base; };
+    this.getMobisModels = function () { return trafficPrediction.mobisModels };
 }
 
 
@@ -164,6 +166,73 @@ TrafficPredictionHandler.prototype.handleGetTrafficPredictionsById = function (r
             
             res.status(200).json(recs['records'])
         }
+    }
+    catch (err) {
+        handleBaseClosedError(err, req, res);
+    }
+}
+
+// Returns the most up to date records, containing evaluations
+TrafficPredictionHandler.prototype.handleGetEvaluations = function (req, res) {
+    var recs = [];
+    var base = this.getBase();
+     
+    try {
+        base.getStoreList().forEach(function (storeNm) {
+            if (storeNm.storeName.indexOf("resampledStore") != -1) {
+                var store = base.store(storeNm.storeName);
+                if (store.last != null) {
+                    // get the most up to date record with all evaluatins (all horizons)
+                    var id = store.last.measuredBy.Name.replace("-", "_");
+                    var horizons = this.getMobisModels()[id].horizons;
+                    var maxHorizon = Math.max.apply(Math, horizons);
+                    var maxBuffersName = this.getMobisModels()[id].recordBuffers[maxHorizon].name
+
+                    var lastEvaluatedRecId = store.getStreamAggr(maxBuffersName).val.oldest.$id;
+                    var lastEvaluatedRec = store[lastEvaluatedRecId];
+                    
+                    recs.push(helper.toJSON(lastEvaluatedRec, 2));
+                }
+            }
+        }, this)
+        res.status(200).json(recs);
+    }
+    catch (err) {
+        handleBaseClosedError(err, req, res);
+    } 
+}
+
+// Returns specific most up to date records, containing evaluations
+TrafficPredictionHandler.prototype.handleGetEvaluationsById = function (req, res) {
+    var id = req.params.id;
+    id = id.replace("-", "_");
+    
+    try {
+        var store = this.getBase().store("resampledStore_" + id);
+        
+        // check if store exists
+        if (store == null) {
+            logger.warn("Store with id %s was not found.", id);
+            res.status(400).json({ error: 'Store with id ' + id + ' was not found.' });
+            return;
+        }
+
+        // check if store has any records
+        if (store.last == null) {
+            logger.warn('No records were found for store with id %s', id);
+            res.status(400).json({ error: 'No records were found for store with id ' + id });
+            return;
+        }
+        
+        // get the most up to date record with all evaluatins (all horizons)
+        var horizons = this.getMobisModels()[id].horizons;
+        var maxHorizon = Math.max.apply(Math, horizons);
+        var maxBuffersName = this.getMobisModels()[id].recordBuffers[maxHorizon].name
+        var lastEvaluatedRecId = store.getStreamAggr(maxBuffersName).val.oldest.$id;
+        var lastEvaluatedRec = store[lastEvaluatedRecId];
+        
+        // return record with all nested objects
+        res.status(200).json(helper.toJSON(lastEvaluatedRec,2));
     }
     catch (err) {
         handleBaseClosedError(err, req, res);

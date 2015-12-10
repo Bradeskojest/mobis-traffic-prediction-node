@@ -76,3 +76,41 @@ exports.discretizeTrafficStatus = function (val) {
     else if (val < 4.5) { return 4 }
     else { return 5 }
 }
+
+function toJSON (obj, depth) {
+    // if input obj is record 
+    if (typeof obj.map === "undefined") {
+        var rec = obj;
+        // main function that parses rec to JSON
+        depth = (depth == null) ? 0 : depth;
+        if (depth === 0) {
+            return rec.toJSON();
+        } else {
+            var newRec = rec.toJSON();
+            // find all store joins from this rec
+            rec.$store.joins.forEach(function (join) {
+                if (rec[join.name] != null) {
+                    newRec[join.name] = [];
+                    if (rec[join.name].hasOwnProperty("length")) {
+                        rec[join.name].each(function (inner, i) {
+                            // find and append joined records in their original store
+                            newRec[join.name][i] = toJSON(inner, depth - 1);
+                        });
+                    } else {
+                        newRec[join.name] = toJSON(rec[join.name], depth - 1);
+                    }
+                }
+            });
+            return newRec;
+        }
+    }
+    // if input obj is record set
+    else {
+        var newRs = obj.toJSON();
+        newRs.records = obj.map(function (rec) {
+            return toJSON(rec, depth);
+        });
+        return newRs;
+    }
+};
+exports.toJSON = toJSON;

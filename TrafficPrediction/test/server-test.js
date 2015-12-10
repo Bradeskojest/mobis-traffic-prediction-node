@@ -56,14 +56,14 @@ describe('Server test', function () {
         server.close(done);
     })
     
-    //// localhost:3333/
+    // localhost:3333/
     it('#GET ' + url + "/", function () {
         request(url)
             .get("/")
             .expect(200)
     });
     
-    //// localhost:3333/store
+    // localhost:3333/store
     it('#GET ' + url + "/routes", function (done) {
         request(url)
             .get("/routes")
@@ -191,7 +191,7 @@ describe('Server test', function () {
     // localhost:3333/traffic-predictions/9999_99
     it('#GET ' + url + "/traffic-predictions/9999_99", function (done) {
         request(url)
-            .get("/traffic-predictions/0211_12?size=5")
+            .get("/traffic-predictions/9999_99?size=5")
             .set('Accept', 'application/json')
             .expect(400, done)
     });
@@ -199,11 +199,26 @@ describe('Server test', function () {
     // localhost:3333/traffic-predictions
     it('#GET ' + url + "/traffic-predictions/9999_99?size=test", function (done) {
         request(url)
-            .get("/traffic-predictions/0211_12?size=5")
+            .get("/traffic-predictions/9999_99?size=5")
             .set('Accept', 'application/json')
             .expect(400, done)
     });
     
+    // localhost:3333/evaluations
+    it('#GET ' + url + "/evaluations", function (done) {
+        request(url)
+            .get("/evaluations")
+            .set('Accept', 'application/json')
+            .expect(200, done)
+    });
+    
+    // localhost:3333/evaluations/0011_11
+    it('#GET ' + url + "/evaluations/0011_11", function (done) {
+        request(url)
+            .get("/evaluations/0011_11")
+            .set('Accept', 'application/json')
+            .expect(200, done)
+    });
             
     //// localhost:3333/traffic-predictions/add
     it('#POST ' + url + "/traffic-predictions/add", function (done) {
