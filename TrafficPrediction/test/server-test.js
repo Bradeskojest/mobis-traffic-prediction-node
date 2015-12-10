@@ -164,6 +164,14 @@ describe('Server test', function () {
             .expect(200, done)
     });
     
+    // localhost:3333/traffic-predictions?time=22h34
+    it('#GET ' + url + "/traffic-predictionss?time=22h34", function (done) {
+        request(url)
+            .get("/traffic-predictions?time=22h34")
+            .set('Accept', 'application/json')
+            .expect(200,  done)
+    });
+    
     // localhost:3333/traffic-predictions/0011_11
     it('#GET ' + url + "/traffic-predictions/0011_11", function (done) {
         request(url)
