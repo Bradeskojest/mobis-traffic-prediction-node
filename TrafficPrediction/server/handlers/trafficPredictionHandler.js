@@ -102,17 +102,18 @@ TrafficPredictionHandler.prototype.handleGetTrafficPredictions = function (req, 
             res.status(200).json(recs);
         }
         
-        
-        // If id, horizon and time are not specified
-        base.getStoreList().forEach(function (storeNm) {
-            if (storeNm.storeName.indexOf("resampledStore") != -1) {
-                var store = base.store(storeNm.storeName);
-                if (store.last != null) {
-                    recs.push(store.last.toJSON(true, true))
+        else {
+            // If id, horizon and time are not specified
+            base.getStoreList().forEach(function (storeNm) {
+                if (storeNm.storeName.indexOf("resampledStore") != -1) {
+                    var store = base.store(storeNm.storeName);
+                    if (store.last != null) {
+                        recs.push(store.last.toJSON(true, true))
+                    }
                 }
-            }
-        });
-        res.status(200).json(recs);
+            });
+            res.status(200).json(recs);
+        }
 
     }
     catch (err) {
