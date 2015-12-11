@@ -3,6 +3,7 @@
 // Constructor
 function ServiceHandler(trafficPrediction, app) {
     this.getBase = function () { return trafficPrediction.base; };
+    this.gettrafficPrediction = function () { return trafficPrediction };
     this.app = app;
 }
 
@@ -31,6 +32,24 @@ ServiceHandler.prototype.handleCloseBase = function (req, res) {
         }
         else {
             res.status(500).json({ error: "Something went wrong when closing Base." });
+            logger.error(err.stack);
+        }
+    }
+}
+
+// close Base
+ServiceHandler.prototype.handleBackup = function (req, res) {
+    try {
+        this.gettrafficPrediction().backup(true);
+        res.status(200).json({ message: "Backup created" });
+    }
+    catch (err) {
+        if (typeof err.message != 'undefined' && err.message == "[addon] Exception: Base is closed!") {
+            res.status(500).json({ error: "Base is closed!" });
+            logger.warn("Cannot execute. Base is closed!");
+        }
+        else {
+            res.status(500).json({ error: "Internal Server Error" });
             logger.error(err.stack);
         }
     }

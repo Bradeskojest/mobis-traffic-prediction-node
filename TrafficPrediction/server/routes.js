@@ -9,6 +9,8 @@ function setup(app, handlers) {
     app.get('/routes', handlers.service.handleGetRouterPaths.bind(handlers.service));
     // http://traffic.ijs.si/counters/close-base
     //app.get('/close-base', auth, handlers.service.handleCloseBase.bind(handlers.service));
+    // http://traffic.ijs.si/counters/backup
+    app.get('/backup', auth, handlers.service.handleBackup.bind(handlers.service));
     
     // http://traffic.ijs.si/counters/traffic-predictions/get-store-list
     app.get('/get-store-list', handlers.service.handleGetStoreList.bind(handlers.trafficPrediction));
