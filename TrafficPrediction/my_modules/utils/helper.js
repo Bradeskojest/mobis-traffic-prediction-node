@@ -77,6 +77,38 @@ exports.discretizeTrafficStatus = function (val) {
     else { return 5 }
 }
 
+exports.findRecByTime = function (arr, time) {
+    time = time.replace("h", ":"); //Example: 16h00
+    
+    // convert minutes to full hours. Example 16:43 --> 17:00	
+    var tm = time.split(":");
+    tm = tm.map(function (str) { return Number(str) });
+    var hour = (tm[1] > 30) ? (tm[0] + 1) % 24 : tm[0];
+    
+    var result = [];
+    var i = 0;
+    var j = 1;
+    
+    // loop until it find horizon with prediction
+    while (result.length == 0) {
+        time = ("0" + (hour + i * j)).slice(-2) + ":00";
+        
+        // check for predictions 
+        var result = arr.filter(function (predictionRec) {
+            var predTmStr = predictionRec.PredictionTime;
+            var tIdx = predTmStr.indexOf("T");
+            var predTm = predTmStr.slice(tIdx + 1, tIdx + 6);
+            
+            return (predTm == time);
+        })
+        
+        if (j == 1) i++;
+        j *= -1;
+    }
+    
+    return result;
+}
+
 function toJSON (obj, depth) {
     // if input obj is record 
     if (typeof obj.map === "undefined") {
