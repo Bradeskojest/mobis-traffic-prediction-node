@@ -57,6 +57,7 @@ TrafficPredictionHandler.prototype.handleGetTrafficPredictions = function (req, 
     var recs = [];
     var base = this.getBase();
     
+    // MOVE THIS TO HELPER
     // Helper function to find prediction by time: Example: prediction?id=0011_11&time=16h34
     var findRecByTime = function (arr, time) {
         time = time.replace("h", ":"); //Example: 16h00
@@ -67,13 +68,34 @@ TrafficPredictionHandler.prototype.handleGetTrafficPredictions = function (req, 
         var hour = (tm[1] > 30) ? (tm[0] + 1) % 24 : tm[0];
         time = ("0" + hour).slice(-2) + ":00";
         
-        var result = arr.filter(function (predictionRec) {
-            var predTmStr = predictionRec.PredictionTime;
-            var tIdx = predTmStr.indexOf("T");
-            var predTm = predTmStr.slice(tIdx + 1, tIdx + 6);
+        var result = [];
+        var i = 0;
+        var j = 1;
+
+        while (result.length == 0) {
+
+            time = ("0" + (hour + i*j)).slice(-2) + ":00";
+
+            var result = arr.filter(function (predictionRec) {
+                
+                // convert this to new Date
+                // use .getHour
+                
+                // then check if you have a mach
+                // if not, iteratively add or substract one hour until you find a match
+                
+                var predTmStr = predictionRec.PredictionTime;
+                var tIdx = predTmStr.indexOf("T");
+                var predTm = predTmStr.slice(tIdx + 1, tIdx + 6);
+                
+                // cehck if 
+                
+                return (predTm == time);
+            })
             
-            return (predTm == time);
-        })
+            if (j == 1) i++;
+            j = j * -1;
+        }
         
         return result;
     }
