@@ -19,8 +19,11 @@
             "level":"debug"
          }
       },
+      "data":{
+         "countersNodes":"countersNodes.txt",
+         "measurements":"measurements_obvoznica_lite.txt"
+      },
       "qmPath":"qminer",
-      "countersNodes":"countersNodes.txt",
       "partialFlushInterval":false,
       "backupInterval":false
    },
@@ -31,14 +34,19 @@
             "port":9569
          }
       },
-      "admins":{},
+      "admins":{
+
+      },
       "logger":{
          "console":{
             "level":"info"
          }
       },
+      "data":{
+         "countersNodes":"countersNodes_big.txt",
+         "measurements":"measurements_big.txt"
+      },
       "qmPath":"qminer",
-      "countersNodes":"countersNodes_big.txt",
       "partialFlushInterval":false,
       "backupInterval":3600000
    },
@@ -59,8 +67,11 @@
             "level":"error"
          }
       },
+      "data":{
+         "countersNodes":"countersNodes.txt",
+         "measurements":"data-small.json"
+      },
       "qmPath":"qminer",
-      "countersNodes":"countersNodes.txt",
       "partialFlushInterval":false,
       "backupInterval":false
    }

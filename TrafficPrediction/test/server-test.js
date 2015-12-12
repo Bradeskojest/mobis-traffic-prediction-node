@@ -40,7 +40,7 @@ describe('Server test', function () {
         trafficPrediction.init(base);
         
         // Import initial data
-        qm.load.jsonFile(base.store("trafficStore_0011_11"), path.join(__dirname, "../sandbox/data-small.json"));
+        qm.load.jsonFile(base.store("trafficStore_0011_11"), path.join(__dirname, "../sandbox", config.data.measurements ));
 
         // Initialize and start serverserver
         server.init(trafficPrediction);
