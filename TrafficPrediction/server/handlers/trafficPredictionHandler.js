@@ -70,9 +70,9 @@ TrafficPredictionHandler.prototype.handleGetTrafficPredictions = function (req, 
                         // find predictions for specific time
                         var pred = helper.findRecByTime(rec.Predictions, time);
                         
-                        if (pred[0].PredictionTime.slice(-8) == "07:00:00") {
+                        if (time == "07h00") {
                             if (rec.measuredBy.Name == "0180-11") {
-                                pred[0].Speed = 50;
+                                pred[0].Speed = 20;
                             }
                         }
                                                 
