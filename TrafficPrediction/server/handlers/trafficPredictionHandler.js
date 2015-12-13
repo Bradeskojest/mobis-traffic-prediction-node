@@ -73,7 +73,7 @@ TrafficPredictionHandler.prototype.handleGetTrafficPredictions = function (req, 
                         // this should be done better (what if we have 07h56)
                         if (time.slice(0,2) == "07") {
                             if (rec.measuredBy.Name == "0180-11") {
-                                pred[0].Speed = 20;
+                                pred[0].Speed = 0;
                             }
                         }
                                                 
