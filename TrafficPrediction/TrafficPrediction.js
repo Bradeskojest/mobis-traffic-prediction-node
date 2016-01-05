@@ -153,7 +153,16 @@ TrafficPrediction.prototype.initAggregates = function () {
         var model = this.mobisModels[sensorId];
         
         //////// PREPROCESSING ////////
-        // Todo
+        trafficStore.addStreamAggr({
+            name: "fixSpeedWhenNoCars",
+            onAdd: function (rec) {
+                if (rec.NumOfCars === 0) {
+                    rec["Speed"] = rec.measuredBy.MaxSpeed;
+                    rec["TrafficStatus"] = 1
+                }
+            },
+            saveJson: function () { return {} }
+        })
         
         
         //////// RESAMPLER ////////
