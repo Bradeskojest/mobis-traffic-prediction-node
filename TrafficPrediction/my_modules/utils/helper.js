@@ -76,3 +76,73 @@ exports.discretizeTrafficStatus = function (val) {
     else if (val < 4.5) { return 4 }
     else { return 5 }
 }
+
+exports.findRecByTime = function (arr, time) {
+    time = time.replace("h", ":"); //Example: 16h00
+    
+    // convert minutes to full hours. Example 16:43 --> 17:00	
+    var tm = time.split(":");
+    tm = tm.map(function (str) { return Number(str) });
+    var hour = (tm[1] > 30) ? (tm[0] + 1) % 24 : tm[0];
+    
+    var result = [];
+    var i = 0;
+    var j = 1;
+    
+    // loop until it find horizon with prediction
+    while (result.length == 0) {
+        time = ("0" + (hour + i * j)).slice(-2) + ":00";
+        
+        // check for predictions 
+        var result = arr.filter(function (predictionRec) {
+            var predTmStr = predictionRec.PredictionTime;
+            var tIdx = predTmStr.indexOf("T");
+            var predTm = predTmStr.slice(tIdx + 1, tIdx + 6);
+            
+            return (predTm == time);
+        })
+        
+        if (j == 1) i++;
+        j *= -1;
+    }
+    
+    return result;
+}
+
+function toJSON (obj, depth) {
+    // if input obj is record 
+    if (typeof obj.map === "undefined") {
+        var rec = obj;
+        // main function that parses rec to JSON
+        depth = (depth == null) ? 0 : depth;
+        if (depth === 0) {
+            return rec.toJSON();
+        } else {
+            var newRec = rec.toJSON();
+            // find all store joins from this rec
+            rec.$store.joins.forEach(function (join) {
+                if (rec[join.name] != null) {
+                    newRec[join.name] = [];
+                    if (rec[join.name].hasOwnProperty("length")) {
+                        rec[join.name].each(function (inner, i) {
+                            // find and append joined records in their original store
+                            newRec[join.name][i] = toJSON(inner, depth - 1);
+                        });
+                    } else {
+                        newRec[join.name] = toJSON(rec[join.name], depth - 1);
+                    }
+                }
+            });
+            return newRec;
+        }
+    }
+    // if input obj is record set
+    else {
+        var newRs = obj.toJSON();
+        newRs.records = obj.map(function (rec) {
+            return toJSON(rec, depth);
+        });
+        return newRs;
+    }
+};
+exports.toJSON = toJSON;

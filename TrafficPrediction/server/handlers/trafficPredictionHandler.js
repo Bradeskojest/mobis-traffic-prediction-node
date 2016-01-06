@@ -1,9 +1,11 @@
 ﻿var logger = require("../../my_modules/utils/logger/logger.js");
+var helper = require("../../my_modules/utils/helper.js");
 
 
 // Constructor
 var TrafficPredictionHandler = function (trafficPrediction) {
     this.getBase = function () { return trafficPrediction.base; };
+    this.getMobisModels = function () { return trafficPrediction.mobisModels };
 }
 
 
@@ -55,27 +57,6 @@ TrafficPredictionHandler.prototype.handleGetTrafficPredictions = function (req, 
     var recs = [];
     var base = this.getBase();
     
-    // Helper function to find prediction by time: Example: prediction?id=0011_11&time=16h34
-    var findRecByTime = function (arr, time) {
-        time = time.replace("h", ":"); //Example: 16h00
-        
-        // convert minutes to full hours. Example 16:43 --> 17:00	
-        var tm = time.split(":");
-        tm = tm.map(function (str) { return Number(str) });
-        var hour = (tm[1] > 30) ? (tm[0] + 1) % 24 : tm[0];
-        time = ("0" + hour).slice(-2) + ":00";
-        
-        var result = arr.filter(function (predictionRec) {
-            var predTmStr = predictionRec.PredictionTime;
-            var tIdx = predTmStr.indexOf("T");
-            var predTm = predTmStr.slice(tIdx + 1, tIdx + 6);
-            
-            return (predTm == time);
-        })
-        
-        return result;
-    }
-    
     try {
         // If time is specified
         if (req.query.id == null && req.query.horizon == null && req.query.time != null) {
@@ -87,13 +68,8 @@ TrafficPredictionHandler.prototype.handleGetTrafficPredictions = function (req, 
                     if (store.last != null) {
                         var rec = store.last.toJSON(true, true);
                         // find predictions for specific time
-                        var pred = findRecByTime(rec.Predictions, time);
-                        
-                        // Respond with error if no prediction was found
-                        //if (pred[0] == undefined) {
-                        //    res.status(400).json({error: "Prediction for this time does not exist."});
-                        //}
-                        
+                        var pred = helper.findRecByTime(rec.Predictions, time);
+                                                
                         rec.Predictions = pred;
                         recs.push(rec)
                     }
@@ -164,6 +140,73 @@ TrafficPredictionHandler.prototype.handleGetTrafficPredictionsById = function (r
             
             res.status(200).json(recs['records'])
         }
+    }
+    catch (err) {
+        handleBaseClosedError(err, req, res);
+    }
+}
+
+// Returns the most up to date records, containing evaluations
+TrafficPredictionHandler.prototype.handleGetEvaluations = function (req, res) {
+    var recs = [];
+    var base = this.getBase();
+     
+    try {
+        base.getStoreList().forEach(function (storeNm) {
+            if (storeNm.storeName.indexOf("resampledStore") != -1) {
+                var store = base.store(storeNm.storeName);
+                if (store.last != null) {
+                    // get the most up to date record with all evaluatins (all horizons)
+                    var id = store.last.measuredBy.Name.replace("-", "_");
+                    var horizons = this.getMobisModels()[id].horizons;
+                    var maxHorizon = Math.max.apply(Math, horizons);
+                    var maxBuffersName = this.getMobisModels()[id].recordBuffers[maxHorizon].name
+
+                    var lastEvaluatedRecId = store.getStreamAggr(maxBuffersName).val.oldest.$id;
+                    var lastEvaluatedRec = store[lastEvaluatedRecId];
+                    
+                    recs.push(helper.toJSON(lastEvaluatedRec, 2));
+                }
+            }
+        }, this)
+        res.status(200).json(recs);
+    }
+    catch (err) {
+        handleBaseClosedError(err, req, res);
+    } 
+}
+
+// Returns specific most up to date records, containing evaluations
+TrafficPredictionHandler.prototype.handleGetEvaluationsById = function (req, res) {
+    var id = req.params.id;
+    id = id.replace("-", "_");
+    
+    try {
+        var store = this.getBase().store("resampledStore_" + id);
+        
+        // check if store exists
+        if (store == null) {
+            logger.warn("Store with id %s was not found.", id);
+            res.status(400).json({ error: 'Store with id ' + id + ' was not found.' });
+            return;
+        }
+
+        // check if store has any records
+        if (store.last == null) {
+            logger.warn('No records were found for store with id %s', id);
+            res.status(400).json({ error: 'No records were found for store with id ' + id });
+            return;
+        }
+        
+        // get the most up to date record with all evaluatins (all horizons)
+        var horizons = this.getMobisModels()[id].horizons;
+        var maxHorizon = Math.max.apply(Math, horizons);
+        var maxBuffersName = this.getMobisModels()[id].recordBuffers[maxHorizon].name
+        var lastEvaluatedRecId = store.getStreamAggr(maxBuffersName).val.oldest.$id;
+        var lastEvaluatedRec = store[lastEvaluatedRecId];
+        
+        // return record with all nested objects
+        res.status(200).json(helper.toJSON(lastEvaluatedRec,2));
     }
     catch (err) {
         handleBaseClosedError(err, req, res);

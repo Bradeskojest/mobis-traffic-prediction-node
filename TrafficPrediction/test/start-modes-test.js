@@ -62,7 +62,7 @@ describe('Testing start modes:', function () {
             var trafficPrediction = new TrafficPrediction();
             trafficPrediction.init(base);
             // Import initial data
-            qm.load.jsonFile(base.store("trafficStore_0011_11"), path.join(__dirname, "../sandbox/data-small.json"));
+            qm.load.jsonFile(base.store("trafficStore_0011_11"), path.join(__dirname, "../sandbox", config.data.measurements));
             // Initialize and start serverserver
             server.init(trafficPrediction);
             server.start(config.trafficPredictionService.server.port);
