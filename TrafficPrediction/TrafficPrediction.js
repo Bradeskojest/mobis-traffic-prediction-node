@@ -154,16 +154,18 @@ TrafficPrediction.prototype.initAggregates = function () {
         var model = this.mobisModels[sensorId];
         
         //////// PREPROCESSING ////////
-        trafficStore.addStreamAggr({
-            name: "fixSpeedWhenNoCars",
-            onAdd: function (rec) {
-                if (rec.NumOfCars === 0) {
-                    rec["Speed"] = rec.measuredBy.MaxSpeed;
-                    rec["TrafficStatus"] = 1
-                }
-            },
-            saveJson: function () { return {} }
-        })
+        // check if TrafficStatus===6 is done before we push record to store 
+        // (in importData.js and trafficPredictionHandler.js)
+        //trafficStore.addStreamAggr({
+        //    name: "fixSpeedWhenNoCars",
+        //    onAdd: function (rec) {
+        //        if (rec.NumOfCars === 0) {
+        //            rec["Speed"] = rec.measuredBy.MaxSpeed;
+        //            rec["TrafficStatus"] = 1
+        //        }
+        //    },
+        //    saveJson: function () { return {} }
+        //})
         
         
         //////// RESAMPLER ////////

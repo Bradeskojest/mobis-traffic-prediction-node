@@ -69,19 +69,27 @@
         
         var rec = loadStores[lowestRecIdx].allRecords[currRecIdxs[lowestRecIdx]]
         
+        // set flag to false if TrafficStatus is 6 (means error)
+        var triggerAggregates = true
+        if (rec.hasOwnProperty("TrafficStatus")) {
+            if (rec.TrafficStatus === 6) {
+                triggerAggregates = false; // do not trigger pipeline
+            }
+        }
+        
         // If outStores is "", we have to find appropriate store according to id
         if (targetStores === "") {
             id = rec.measuredBy.Name.replace("-", "_");
             trafficStore = rec.$store.base.store("trafficStore_" + id);
-            
+                
             //console.log("Getting rec with id: " + id + ", Timestamp: " + rec.DateTime.toISOString());
             if (trafficStore !== null) {
-                trafficStore.push(rec.toJSON(true));
+                trafficStore.push(rec.toJSON(true), triggerAggregates);
             } else {
                 console.log("Store with id %s was not found.", id);
             }
         } else {
-            targetStores[lowestRecIdx].push(rec.toJSON(true));
+            targetStores[lowestRecIdx].push(rec.toJSON(true), triggerAggregates);
         }
         
         currRecIdxs[lowestRecIdx]++

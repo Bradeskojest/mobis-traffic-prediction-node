@@ -15,21 +15,21 @@ predictionService.start(trafficPrediction, mode);
 
 
 // schedule partialFlush-ing (if defined)
-//if (config.partialFlushInterval) {
-//    var interval = config.partialFlushInterval;
-//    setInterval(function () { trafficPrediction.base.partialFlush() }, interval);
-//}
-//// schedule backup-ing (if defined)
-//if (config.backupInterval) {
-//    var interval = config.backupInterval;
-//    setInterval(function () { trafficPrediction.backup(true) }, interval);
-//} 
+if (config.partialFlushInterval) {
+    var interval = config.partialFlushInterval;
+    setInterval(function () { trafficPrediction.base.partialFlush() }, interval);
+}
+// schedule backup-ing (if defined)
+if (config.backupInterval) {
+    var interval = config.backupInterval;
+    setInterval(function () { trafficPrediction.backup(true) }, interval);
+} 
 
 // START SERVER
 server.init(trafficPrediction);
 server.start(config.trafficPredictionService.server.port);
 
 // create backup before running server
-//trafficPrediction.backup(true);
-trafficPrediction.backupAsync(true);
+trafficPrediction.backup(true);
+//trafficPrediction.backupAsync(true);
 
