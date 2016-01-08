@@ -1,20 +1,19 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-    <!--<meta http-equiv="refresh" content="30; URL=http://shodan.ijs.si:8000/fleet.html?user=TT">-->
-    <script src="https://maps-api-ssl.google.com/maps/api/js?key=AIzaSyABXHw-jGvuRNVXpwQck-MbMvu4frIlRMg"></script>
-
+	<script src="https://maps-api-ssl.google.com/maps/api/js?key=AIzaSyABXHw-jGvuRNVXpwQck-MbMvu4frIlRMg"></script>
+   
     <!--JQUERY -->
     <!--<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>-->
     <!--<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">-->
     <!--<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>-->
-    <!-- include the jQuery and jQuery UI scripts -->
-    <script src="https://code.jquery.com/jquery-2.1.1.js"></script>
-    <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
-
-    <!-- plus a jQuery UI theme, here I use "flick" -->
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/flick/jquery-ui.css">
-
+		<!-- include the jQuery and jQuery UI scripts -->
+	<script src="https://code.jquery.com/jquery-2.1.1.js"></script>
+	<script src="https://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+					
+	<!-- plus a jQuery UI theme, here I use "flick" -->
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/flick/jquery-ui.css">
+    
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
@@ -22,51 +21,152 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="stylesheet" type="text/css" href="css/jquery-ui-slider-pips.css">
     <script src="js/sensors.js"></script>
-    <script src="js/jquery-ui-slider-pips.js"></script>
-
+	<script src="js/jquery-ui-slider-pips.js"></script>
+	
 
     <!--Marker with label0-->
     <script src="//google-maps-utility-library-v3.googlecode.com/svn/tags/markerwithlabel/1.0.1/src/markerwithlabel_packed.js"></script>
 
-
+	<!-- charts -->
+	<script src="https://code.highcharts.com/highcharts.js"></script>
+	<script src="https://code.highcharts.com/modules/data.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
+	
+	<!-- Additional files for the Highslide popup effect -->
+	<script src="https://www.highcharts.com/samples/static/highslide-full.min.js"></script>
+	<script src="https://www.highcharts.com/samples/static/highslide.config.js" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="https://www.highcharts.com/samples/static/highslide.css" />
+	
 </head>
 
 <body>
     <div class="topBar">
         <img style="display: inline;" src="./images/mobis.png" height="37px;" />
-        <img style="display: inline;" src="./images/optimum.png" height="37px;" />
+        <!--<img style="display: inline;"  src="./images/optimum.png" height="37px;" />-->
         <div class="topElement">
-            <label for="amount" class="prediction-picker">Prediction horizon [in hours]:</label>
-            <input type="text" id="amount" readonly style="border:0; color:#D11042; font-weight:bold;">
+			<label for="amount" class="prediction-picker">Prediction horizon [hours]:</label>
+			<input type="text" id="amount" readonly style="border:0; color:#D11042; font-weight:bold;">
         </div>
-        <div class="topSlider topElement">
-            <div id="slider-range-min"></div>
-        </div>
-        <button id="treshold-options-button">Show treshold options </button>
-    </div>
-
+		<div class="topSlider topElement">
+			<div id="slider-range-min"></div>
+		</div>
+		<div class="topElement prediction-picker" id="date" style="font-weight:bold;"></div>
+		<button class='top-button' id="graphs-button"> Graphs </button>
+   		<button class='top-button' id="evaluation-button"> Evaluation </button>
+   		<button class='top-button' id="treshold-options-button"> Treshold options </button>
+	</div>
+	
     <div class="google-maps" id="googleMap"></div>
-
-    <div class="right-content">
-        <b>Lower tresholds (deviation[%]) </b>
-        <div class="tresholds">
-            <label for="green" class="tresholds">Normal traffic:</label>
-            <input type="text" class="tresholds" id="green" readonly style="border:0; font-weight:bold;">
-            <div id="slider-range-green" class="right-slider"></div>
-        </div>
-        <div class="tresholds">
-            <label for="yellow" class="tresholds">Increased traffic:</label>
-            <input type="text" class="tresholds" id="yellow" readonly style="border:0; font-weight:bold;">
-            <div id="slider-range-yellow" class="right-slider"></div>
-        </div>
-        <div class="tresholds">
-            <label for="orange" class="tresholds">Heavy traffic:</label>
-            <input type="text" class="tresholds" id="orange" readonly style="border:0; font-weight:bold;">
-            <div id="slider-range-orange" class="right-slider"></div>
-        </div>
-        <!--<input type="text" class="tresholds" id="alter" readonly style="border:0; font-weight:bold;">
-        <div id="alternating-slider"></div>-->
-    </div>
+   
+   <div class="right-content" id="eval"> 
+		<div id='eval-data'> </div>
+		<div id='R2' class='column'> </div> 
+		<div id='MAPE' class='column'> </div> 
+		<div id='MAE' class='column'> </div>	 
+   </div>
+   
+   	<div class="right-content" id="tresholds">			
+			<form>
+				<div class='right-content-button'>
+					<input type="radio" name="slider" value="status" checked>
+				</div>
+				<div class='right-content-radio'>
+					<b>Status-based</b>
+				</div>
+				<div class="treshold-sliders" id="status-sliders">
+					Lower tresholds (traffic status)
+					<div class="tresholds">
+						<label for="green-status" class="tresholds">Normal traffic:</label>
+						<input type="text" class="tresholds" id="green-status" readonly style="border:0; font-weight:bold;">
+						<div id="slider-range-green-status" class="right-slider"></div>
+					</div>
+					<div class="tresholds">
+						<label for="yellow-status" class="tresholds">Increased traffic:</label>
+						<input type="text" class="tresholds" id="yellow-status" readonly style="border:0; font-weight:bold;">
+						<div id="slider-range-yellow-status" class="right-slider"></div>
+					</div>
+					<div class="tresholds">
+						<label for="orange-status" class="tresholds">Heavy traffic:</label>
+						<input type="text" class="tresholds" id="orange-status" readonly style="border:0; font-weight:bold;">
+						<div id="slider-range-orange-status" class="right-slider"></div>
+					</div>
+				</div>		
+				
+				<br>
+				
+				<div class='right-content-button'>
+					<input type="radio" name="slider" value="speed">
+				</div> 
+				<div class='right-content-radio'>
+					<b>Speed-based</b>
+				</div>
+				<div class="treshold-sliders" id="speed-sliders">
+					Lower tresholds (deviation[%])
+					<div class="tresholds">
+						<label for="green" class="tresholds">Normal traffic:</label>
+						<input type="text" class="tresholds" id="green" readonly style="border:0; font-weight:bold;">
+						<div id="slider-range-green" class="right-slider"></div>
+					</div>
+					<div class="tresholds">
+						<label for="yellow" class="tresholds">Increased traffic:</label>
+						<input type="text" class="tresholds" id="yellow" readonly style="border:0; font-weight:bold;">
+						<div id="slider-range-yellow" class="right-slider"></div>
+					</div>
+					<div class="tresholds">
+						<label for="orange" class="tresholds">Heavy traffic:</label>
+						<input type="text" class="tresholds" id="orange" readonly style="border:0; font-weight:bold;">
+						<div id="slider-range-orange" class="right-slider"></div>
+					</div>
+				</div>
+				
+				<br>
+				
+				<div class='right-content-button'>
+					<input type="radio" name="slider" value="evaluation">
+				</div> 
+				<div class='right-content-radio'>
+					<b>Evaluation-based</b>
+				</div>
+				<div class="treshold-sliders" id="evaluation-sliders">
+					Choose attribute: 
+					<select id="eval-attribute">
+						<option value="NumOfCars" checked>Flow</option>
+						<option value="TrafficStatus">Traffic status</option>
+						<option value="Speed">Speed</option>
+						<option value="Occupancy">Occupancy</option>
+					</select> <br>
+					<input type="radio" name="eval-type" value="R2" checked> R2 [%] <br>
+					<input type="radio" name="eval-type" value="MAPE"> MAPE
+					<div class="tresholds">
+						<label for="green-eval" class="tresholds">Top-evaluated predictions:</label>
+						<input type="text" class="tresholds" id="green-eval" readonly style="border:0; font-weight:bold;">
+						<div id="slider-range-green-eval" class="right-slider"></div>
+					</div>
+					<div class="tresholds">
+						<label for="yellow-eval" class="tresholds">Medium-evaluated predictions:</label>
+						<input type="text" class="tresholds" id="yellow-eval" readonly style="border:0; font-weight:bold;">
+						<div id="slider-range-yellow-eval" class="right-slider"></div>
+					</div>
+					<div class="tresholds">
+						<label for="orange-eval" class="tresholds">Bottom-evaluated predictions:</label>
+						<input type="text" class="tresholds" id="orange-eval" readonly style="border:0; font-weight:bold;">
+						<div id="slider-range-orange-eval" class="right-slider"></div>
+					</div>
+				</div>
+			</form> 			
+   	</div>
+	   
+	<div class="right-content" id="charts"> 
+		<div id='sensor-data'> </div>
+		<div id='chart1' class='chart'> </div> 
+		<div id='chart2' class='chart'> </div> 
+		<div id='chart3' class='chart'> </div>
+		<div class="tresholds">
+				<label for="limit" class="tresholds">History [hours]:</label>
+				<input type="text" class="tresholds" id="limit" readonly style="border:0; font-weight:bold;">
+				<div id="slider-range-limit" class="right-slider"></div>
+		</div>
+	</div>
 
 </body>
 

@@ -11,6 +11,11 @@ function ServiceHandler(trafficPrediction, app) {
 ServiceHandler.prototype.handleGetRouterPaths = function (req, res) {
     var routerPaths = [];
     var test = this.app;
+    
+    if (this.getBase().mode === "backup") { 
+        res.status(205).json({ message: "System is backing up. Please try later." });
+    }
+
     this.app._router.stack.forEach(function (item) {
         if (item.route != undefined) {
             routerPaths.push({ "path": item.route.path, "methods": item.route.methods });

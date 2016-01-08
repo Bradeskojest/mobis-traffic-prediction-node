@@ -7,6 +7,7 @@ var env = process.env.NODE_ENV || 'development';
 var config = require('./config.json')[env];
 var qm = require(config.qmPath);
 var path = require('path');
+var fs = require('fs-extra')
 var evaluation = qm.analytics.metrics;
 var logger = require("./my_modules/utils/logger/logger.js");
 
@@ -153,7 +154,18 @@ TrafficPrediction.prototype.initAggregates = function () {
         var model = this.mobisModels[sensorId];
         
         //////// PREPROCESSING ////////
-        // Todo
+        // check if TrafficStatus===6 is done before we push record to store 
+        // (in importData.js and trafficPredictionHandler.js)
+        //trafficStore.addStreamAggr({
+        //    name: "fixSpeedWhenNoCars",
+        //    onAdd: function (rec) {
+        //        if (rec.NumOfCars === 0) {
+        //            rec["Speed"] = rec.measuredBy.MaxSpeed;
+        //            rec["TrafficStatus"] = 1
+        //        }
+        //    },
+        //    saveJson: function () { return {} }
+        //})
         
         
         //////// RESAMPLER ////////
@@ -254,7 +266,8 @@ TrafficPrediction.prototype.shutdown = function () {
 
 TrafficPrediction.prototype.backup = function (reopen) {
     logger.info("Creating backup...");
-    
+    this.base.mode = 'backup';
+
     // if true, reopen and relode state after backup
     var reopen = (typeof reopen === 'undefined') ? false : reopen;
     
@@ -283,6 +296,47 @@ TrafficPrediction.prototype.backup = function (reopen) {
         console.log();
         logger.info("Model reopened.");
     }
+}
+
+TrafficPrediction.prototype.backupAsync = function (reopen) {
+    //logger.info("Creating backup...");
+    this.base.mode = 'backup';
+    
+    // if true, reopen and relode state after backup
+    var reopen = (typeof reopen === 'undefined') ? false : reopen;
+    
+    // shutdown first (close and save) before backuping
+    if (!this.base.isClosed()) this.shutdown();
+    
+    // copy .db to .backup
+    //Utils.Helper.copyFolder(this.pathDb, this.pathBackup);
+    fs.copy(this.pathDb, this.pathBackup, function (err) {
+        if (err) return console.error(err)
+
+        logger.info("Backup created.");
+
+        //  if reopen flag is true - reopen and load from created backup
+        if (reopen) {
+            logger.info("Reopening model...");
+            // reopen saved base
+            var base = new qm.Base({
+                mode: 'open',
+                dbPath: this.pathDb
+            //dbPath: this.pathBackup // backup is not saved properly
+            })
+            base["mode"] = 'open';
+            
+            // load saved state
+            this.init(base);
+            this.loadState(this.pathDb);
+            //this.loadState(this.pathBackup); // this should load from pathBackup
+            console.log();
+            logger.info("Model reopened.");
+        }
+    }.bind(this))
+
+    logger.info("Creating backup...");
+
 }
 
 // Export function for loading recs from loadStore according to DateTime

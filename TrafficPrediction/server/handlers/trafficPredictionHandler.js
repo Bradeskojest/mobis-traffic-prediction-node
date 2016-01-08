@@ -257,9 +257,17 @@ TrafficPredictionHandler.prototype.handleAddMeasurement = function (req, res) {
         return;
     }
     
+    // set flag to false if TrafficStatus is 6 (means error)
+    var triggerAggregates = true
+    if (rec.hasOwnProperty("TrafficStatus")) {
+        if (rec.TrafficStatus === 6) {
+            triggerAggregates = false; // do not trigger pipeline
+        }
+    }
+
     // Try to add record to store
     try {
-        var id = trafficStore.push(rec);
+        var id = trafficStore.push(rec, triggerAggregates);
     }
     catch (err) {
         res.status(500).json({ error: "Internal Server Error" }).end();

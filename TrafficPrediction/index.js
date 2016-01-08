@@ -10,7 +10,7 @@ var server = require('./server/server.js');
 var trafficPrediction = new TrafficPrediction();
 
 // read input script argument for mode type. Default is "cleanCreate"
-var mode = (process.argv[2] == null) ? "cleanCreate" : process.argv[2];
+var mode = (process.argv[2] == null) ? "cleanCreateLoad" : process.argv[2];
 predictionService.start(trafficPrediction, mode);
 
 
@@ -25,11 +25,11 @@ if (config.backupInterval) {
     setInterval(function () { trafficPrediction.backup(true) }, interval);
 } 
 
-
-// create backup before running server
-//trafficPrediction.backup(true);
-
 // START SERVER
 server.init(trafficPrediction);
 server.start(config.trafficPredictionService.server.port);
+
+// create backup before running server
+trafficPrediction.backup(true);
+//trafficPrediction.backupAsync(true);
 
