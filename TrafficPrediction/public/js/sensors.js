@@ -879,7 +879,7 @@ function drawSpeedGraph(dates, current, predictions, htmlId, title, intervalHour
                     text: null
                 },
 				min: 0,
-				max: 140,
+				//max: 140,
 				tickInterval: 10,
                 labels: {
                     align: 'left',
