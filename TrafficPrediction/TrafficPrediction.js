@@ -7,7 +7,7 @@ var env = process.env.NODE_ENV || 'development';
 var config = require('./config.json')[env];
 var qm = require(config.qmPath);
 var path = require('path');
-var fs = require('fs-extra')
+//var fs = require('fs-extra') //needed for backupAsync
 var evaluation = qm.analytics.metrics;
 var logger = require("./my_modules/utils/logger/logger.js");
 
