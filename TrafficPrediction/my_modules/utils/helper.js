@@ -1,6 +1,7 @@
 var logger = require("./logger/logger.js");
 var qm = require("qminer");
 var path = require('path');
+var fs = require('fs');
 
 // Dummy model, used for feature extractor
 // .setVal() -- sets internal value
@@ -30,7 +31,7 @@ exports.newDummyModel = function () {
 }
 
 exports.copyFolder = function (inFolder, outFolder) {
-    logger.debug("Copying ." + path.basename(inFolder) + " to ." + path.basename(outFolder) + " folder...");
+    logger.debug("Copying ./" + path.basename(inFolder) + " to ./" + path.basename(outFolder) + " folder...");
     
     // read all files in inFolder
     var files = qm.fs.listFile(inFolder, null, true);
@@ -49,8 +50,26 @@ exports.copyFolder = function (inFolder, outFolder) {
             qm.fs.copy(source, dest);
         }
     });
-    logger.debug(files.length + " files copied.");
+    logger.debug(files.length + " files copied.\n");
 }
+
+var deleteFolderRecursive = function (path) {
+    logger.debug("Removing folder ./" + path.basename(path) + "...");
+
+    if (fs.existsSync(path)) {
+        fs.readdirSync(path).forEach(function (file, index) {
+            var curPath = path + "/" + file;
+            if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
+    }
+    logger.debug("Folder ./" + path.basename(path) + "removed.\n");
+};
+exports.deleteFolderRecursive = deleteFolderRecursive;
 
 exports.newInterval = function () {
     var Interval = function () {

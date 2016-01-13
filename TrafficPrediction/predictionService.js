@@ -2,6 +2,7 @@
 var config = require('./config.json')[env];
 var qm = require(config.qmPath);
 var path = require('path');
+var fs = require('fs');
 var logger = require("./my_modules/utils/logger/logger.js");
 Utils.Helper = require('./my_modules/utils/helper.js')
 
@@ -22,15 +23,15 @@ function cleanCreateMode(trafficPrediction) {
 }
 
 // create Base in OPEN mode
-function openMode(trafficPrediction) {
+function openFromDb(trafficPrediction) {
     var base = new qm.Base({
         mode: 'open',
         dbPath: trafficPrediction.pathDb
     })
     base["mode"] = 'open'
-
+    
     //Initiate the traffic prediction workflow
-    trafficPrediction.init(base); 
+    trafficPrediction.init(base);
     
     // load saved models
     trafficPrediction.loadState();
@@ -56,7 +57,7 @@ function restoreFromBackup(trafficPrediction) {
     Utils.Helper.copyFolder(trafficPrediction.pathBackup, trafficPrediction.pathDb);
 
     // call openMode()
-    openMode(trafficPrediction);
+    openFromDb(trafficPrediction);
 }
 
 // create Base in CLEAN CREATE mode and load init data
@@ -93,12 +94,32 @@ function cleanCreateLoadMode(trafficPrediction) {
     //})
 }
 
+// create Base in OPEN mode
+function open(trafficPrediction) {
+    try {
+        // try to open model from ./db folder
+        logger.info("\x1b[32m[Model] Opening model from ./db folder \n\x1b[0m");
+        openFromDb(trafficPrediction);
+
+    } catch (err) {
+        logger.info("\x1b[31m[Model] Failed to open model from ./db folder '\n\x1b[0m");
+        
+        // delete db folder
+        Utils.Helper.deleteFolderRecursive(trafficPrediction.pathDb);
+        
+        // try to open model from ./backup folder
+        logger.info("\x1b[32m[Model] Opening model from ./backup folder\n\x1b[0m");
+        restoreFromBackup(trafficPrediction);
+    }
+}
+
 // function that handles in which mode store should be opened
 function start(trafficPrediction, mode) {
     var modes = {
         'cleanCreate': cleanCreateMode,
         'cleanCreateLoad': cleanCreateLoadMode,
-        'open': openMode,
+        'open': open,
+        'openFromDb': openFromDb,
         'openReadOnly': readOnlyMode,
         'restoreFromBackup': restoreFromBackup
     };

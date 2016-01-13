@@ -1,6 +1,6 @@
 {
   "name": "TrafficPrediction",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "TrafficPrediction",
   "main": "index.js",
   "author": {
@@ -12,7 +12,7 @@
     "url": "https://github.com/bkazic/mobis-traffic-prediction-node"
   },
   "scripts": {
-    "start": "set NODE_ENV=production&& node index.js",
+    "start": "set NODE_ENV=production&& node --max-old-space-size=8192 index.js",
     "test": "set NODE_ENV=test&& mocha --timeout 30000"
   },
   "dependencies": {
