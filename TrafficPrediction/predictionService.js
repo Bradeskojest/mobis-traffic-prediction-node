@@ -103,12 +103,12 @@ function open(trafficPrediction) {
 
     } catch (err) {
         logger.info("\x1b[31m[Model] Failed to open model from ./db folder '\n\x1b[0m");
+        logger.info("\x1b[32m[Model] Opening model from ./backup folder\n\x1b[0m");
         
         // delete db folder
         Utils.Helper.deleteFolderRecursive(trafficPrediction.pathDb);
         
         // try to open model from ./backup folder
-        logger.info("\x1b[32m[Model] Opening model from ./backup folder\n\x1b[0m");
         restoreFromBackup(trafficPrediction);
     }
 }

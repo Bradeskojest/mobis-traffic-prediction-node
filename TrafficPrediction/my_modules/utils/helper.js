@@ -53,9 +53,7 @@ exports.copyFolder = function (inFolder, outFolder) {
     logger.debug(files.length + " files copied.\n");
 }
 
-var deleteFolderRecursive = function (path) {
-    logger.debug("Removing folder ./" + path.basename(path) + "...");
-
+function deleteFolderRecursive (path) {
     if (fs.existsSync(path)) {
         fs.readdirSync(path).forEach(function (file, index) {
             var curPath = path + "/" + file;
@@ -67,7 +65,6 @@ var deleteFolderRecursive = function (path) {
         });
         fs.rmdirSync(path);
     }
-    logger.debug("Folder ./" + path.basename(path) + "removed.\n");
 };
 exports.deleteFolderRecursive = deleteFolderRecursive;
 
