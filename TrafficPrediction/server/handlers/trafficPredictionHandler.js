@@ -163,8 +163,24 @@ TrafficPredictionHandler.prototype.handleGetEvaluations = function (req, res) {
                     var maxBuffersName = this.getMobisModels()[id].recordBuffers[maxHorizon].name
 
                     var lastEvaluatedRecId = store.getStreamAggr(maxBuffersName).val.oldest.$id;
-                    var lastEvaluatedRec = store[lastEvaluatedRecId];
+                    //var lastEvaluatedRec = store[lastEvaluatedRecId];
                     
+                    // find the latest record with evaluations for all horizons
+                    var lastEvaluatedRec = undefined;
+                    do {
+                        var ok = true;
+                        lastEvaluatedRec = store[lastEvaluatedRecId];
+                        // check if any empty Evaluations rec set is found in lastEvaluatedRec.Predictions
+                        lastEvaluatedRec.Predictions.each(function (prediction) {
+                            // set ok to false if empty Evaluation rec set is found
+                            if (prediction.Evaluation.empty == true) ok = false;
+                        })
+                        // decrement lastEvaluatedRecId and try again 
+                        lastEvaluatedRecId--;
+                    } 
+                    while (ok == false);
+                    
+                    // push record to recs which will be sent to output
                     recs.push(helper.toJSON(lastEvaluatedRec, 2));
                 }
             }
