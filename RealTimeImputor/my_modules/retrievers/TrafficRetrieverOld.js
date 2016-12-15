@@ -40,39 +40,42 @@ TrafficRetriever.prototype.fetchData = function (callback) {
     }.bind(this));
 }
 
+//async.eachSeries
+
+
+// Parse all measurements first, and send them after
+//TrafficRetriever.prototype.test = function (callback) {
+//    this.fetchData(function (error, data) {
+//        if (error) return callback(error)
+        
+//        var count = 0; // Just for debugging
+
+//        data.feed.entry.forEach(function (rec) {
+//            process.nextTick(function () {
+//                measurementRec = formatMeasurementRecord(rec);
+//                callback(null, measurementRec);
+                
+//                logger.debug("Count:", count++); // Just for debugging
+//            });            
+//        });
+
+//    });
+//}
+
+
 // USING ASYNC MODULE
 // Parse and send measurement one by one.
 TrafficRetriever.prototype.start = function (callback) {
     this.fetchData(function (error, data) {
         if (error) return callback(error)
         
-        var dateTimeString = data.Contents[0].ModifiedTime;
-        var dateTime = generateDateTime(dateTimeString);
-        var Items = data.Contents[0].Data.Items;
-
         var count = 0; // Just for debugging
         
-        async.eachSeries(Items, function (item, next) {
-
-            // parse all sensors from specific section
-            async.eachSeries(item.Data, function (rec, _next) {
-                var Id = rec.Id;              
-
-                measurementRec = formatMeasurementRecord(rec.properties);
-                measurementRec.DateTime = dateTime;
-                measurementRec.measuredBy = { Name: Id };
-                
-                logger.debug("Count:", count++); // Just for debugging
-                callback(null, measurementRec, _next);
-
-            }, function (_err) {
-                if (_err) {
-                    return callback(_err);
-                    logger.error(_err.stack);
-                }
-                logger.info("Next section.");
-                next();
-            });    
+        async.eachSeries(data.feed.entry, function iterator(rec, next) {
+            measurementRec = formatMeasurementRecord(rec);
+            callback(null, measurementRec, next);
+            
+            logger.debug("Count:", count++); // Just for debugging
 
         }, function (err) {
             if (err) {
@@ -103,23 +106,25 @@ TrafficRetriever.prototype.saveToMongo = function () {
 // Formating measure record to match QMiner format
 function formatMeasurementRecord(data) {
     var rec = {
-        NumOfCars: Number(checkField(data, "stevci_stev")),
-        //Occupancy: checkField(data, "stevci_occ"),
-        Speed: Number(checkField(data, "stevci_hit")),
-        TrafficStatus: Number(checkField(data, "stevci_stat"))
+        DateTime: generateDateTime(checkField(data, "stevci_datum"), checkField(data, "stevci_ura")),
+        NumOfCars: checkField(data, "stevci_stev"),
+        Occupancy: checkField(data, "stevci_occ"),
+        Speed: checkField(data, "stevci_hit"),
+        TrafficStatus: checkField(data, "stevci_stat"),
+        measuredBy: { Name: checkField(data, "id") }
     };
     
     return rec;
 }
 
 // generate DateTime object (ISO format)
-function generateDateTime(dateTimeString) {
+function generateDateTime(dateString, timeString) {
     try {
-        var date = new Date(dateTimeString);
+        //var date = new Date(dateString + " " + timeString)
+        var date = parseDateTime(dateString, timeString)
     } catch (e) {
         logger.error(e.stack)
     }
-
     // Ugly Hack: TrafficPrediction model expects datetime in ISOFormat but with local offset (+2H)
     var tzoffset = (new Date()).getTimezoneOffset() * 60000; // Ugly Hack
     var date = new Date(date - tzoffset) // Ugly Hack
@@ -131,7 +136,6 @@ function generateDateTime(dateTimeString) {
     }
 }
 
-// NOT USED ANY MORE
 function parseDateTime(d, t) { 
     // 2 options of dateTime format:
     // 1.) is "6/29/2015" + "9:35:00 PM"
@@ -158,7 +162,6 @@ function parseDateTime(d, t) {
     return date;
 }
 
-// NOT USED ANY MORE
 function ifDateIsValid(d) {
     // ref: http://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript
     if (Object.prototype.toString.call(d) === "[object Date]") {
