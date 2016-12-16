@@ -104,9 +104,8 @@ TrafficRetriever.prototype.saveToMongo = function () {
 function formatMeasurementRecord(data) {
     var rec = {
         NumOfCars: Number(checkField(data, "stevci_stev")),
-        //Occupancy: checkField(data, "stevci_occ"),
         Occupancy: 0,
-	    Speed: Number(checkField(data, "stevci_hit")),
+        Speed: Number(checkField(data, "stevci_hit")),
         TrafficStatus: Number(checkField(data, "stevci_stat"))
     };
     
