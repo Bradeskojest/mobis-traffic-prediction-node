@@ -105,7 +105,8 @@ function formatMeasurementRecord(data) {
     var rec = {
         NumOfCars: Number(checkField(data, "stevci_stev")),
         //Occupancy: checkField(data, "stevci_occ"),
-        Speed: Number(checkField(data, "stevci_hit")),
+        Occupancy: 0,
+	    Speed: Number(checkField(data, "stevci_hit")),
         TrafficStatus: Number(checkField(data, "stevci_stat"))
     };
     
