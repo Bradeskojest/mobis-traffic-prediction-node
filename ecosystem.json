@@ -1,0 +1,32 @@
+{
+  "apps" : [{
+    "name"        : "traffic-prediction",
+    "script"      : "index.js",
+    "interpreter" : "node@0.12.7",
+    "node_args"   : "--max-old-space-size=8192",
+    "cwd"         : "./TrafficPrediction",
+    "env": {
+      "NODE_ENV": "production"
+    },
+    "env_production" : {
+       "NODE_ENV": "production"
+    },
+    "env_development" : {
+       "NODE_ENV" : "development"
+    }
+  },{
+    "name"       : "traffic-prediction-imputor",
+    "script"      : "index.js",
+    "interpreter" : "node@0.12.7",
+    "cwd"         : "./RealTimeImputor",
+    "env": {
+      "NODE_ENV": "production"
+    },
+    "env_production" : {
+       "NODE_ENV": "production"
+    },
+    "env_development" : {
+       "NODE_ENV" : "development"
+    }
+  }]
+}
